@@ -42,11 +42,12 @@ def History_finder(y, m):
     data = pd.DataFrame(result['data'], columns=columns)
     data['date'] = pd.to_datetime(data['timestamp'], unit='ms')
     data.sort_values(by='date', inplace=True)
-    data.set_index('date', inplace=True)
     data[['open', 'high', 'low', 'close']] = data[['open', 'high', 'low', 'close']].apply(pd.to_numeric)
     data.drop(['volume', 'timestamp', 'confirm', 'volCcyQuote', 'volCcy'], axis=1, inplace=True)
     full_data = pd.concat([full_data, data])
-    
+    full_data['date'] = pd.to_datetime(full_data['date'])
+    full_data['date'] = full_data['date'].dt.strftime('%Y-%m-%d')
+
     return full_data
 
 app = Flask(__name__)
