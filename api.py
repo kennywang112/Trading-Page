@@ -23,7 +23,10 @@ okxSPOT = OkxSPOT(
 full_data = pd.DataFrame(columns=['open', 'high', 'low', 'close'])
 
 def History_finder(y, m):
-    global full_data  # Declare full_data as a global variable
+
+    full_data = pd.DataFrame(columns=['open', 'high', 'low', 'close'])
+
+    # global full_data  # Declare full_data as a global variable
     month = f"{y}-{m}-1"
     time_before = datetime.strptime(month, "%Y-%m-%d").timestamp()
     
@@ -33,14 +36,14 @@ def History_finder(y, m):
         time_after = datetime.strptime('2024-1-31', "%Y-%m-%d").timestamp()
         
     result = market.get_history_candles(
-        instId='BTC-USDT',
-        before=str(round(time_before * 1000)),
-        after=str(round(time_after * 1000)),
-        bar='1D'
+        instId = 'BTC-USDT',
+        before = str(round(time_before * 1000)),
+        after = str(round(time_after * 1000)),
+        bar = '1D'
     )
     
-    data = pd.DataFrame(result['data'], columns=columns)
-    data['date'] = pd.to_datetime(data['timestamp'], unit='ms')
+    data = pd.DataFrame(result['data'], columns = columns)
+    data['date'] = pd.to_datetime(data['timestamp'], unit = 'ms')
     data.sort_values(by='date', inplace=True)
     data[['open', 'high', 'low', 'close']] = data[['open', 'high', 'low', 'close']].apply(pd.to_numeric)
     data.drop(['volume', 'timestamp', 'confirm', 'volCcyQuote', 'volCcy'], axis=1, inplace=True)
@@ -60,7 +63,7 @@ def home():
 
     full_data = History_finder(2024, 1)
 
-    return full_data.to_json(orient='records')
+    return full_data.to_json(orient = 'records')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug = True)
