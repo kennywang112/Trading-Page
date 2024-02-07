@@ -42,39 +42,6 @@ body {
   text-align: center;
 }
 
-.owl-carousel .owl-item img {
-  width: inherit !important;
-  text-align: center;
-  margin: 0 auto;
-  height: 90px;
-}
-
-.owl-carousel .owl-nav.disabled {
-   display: inherit !important;
-  padding-top: 80px;
-}
-
-
-.owl-carousel .owl-nav button.owl-next, 
-.owl-carousel .owl-nav button.owl-prev {
-   width: 90px;
-   height: 90px;
-   background-color: #ed1c24 !important;
-   color: #ffffff !important;
-   font-size: 55px !important;
-   line-height: 30px !important;
-   opacity: 1;
-   border-radius: 50px;
-   transition: ease-in all 0.5s;
-   box-shadow: 0 0 80px rgba(13, 3, 3, 0.11);
-}
-.owl-carousel .owl-nav button.owl-next:hover, 
-.owl-carousel .owl-nav button.owl-prev:hover {
-   background-color: #ffffff !important;
-   transition: ease-in all 0.5s;
-   color: #000 !important;
-}
-
 main {
   display: flex;
   flex-direction: column;

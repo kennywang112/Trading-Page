@@ -21,13 +21,9 @@ okxSPOT = OkxSPOT(
     passphrase="",
 )
 
-full_data = pd.DataFrame(columns=['open', 'high', 'low', 'close'])
+def History_finder(y, m, inter, full_data):
 
-def History_finder(y, m):
-
-    full_data = pd.DataFrame(columns=['open', 'high', 'low', 'close'])
-
-    # global full_data  # Declare full_data as a global variable
+    # Declare full_data as a global variable
     month = f"{y}-{m}-1"
     time_before = datetime.strptime(month, "%Y-%m-%d").timestamp()
     
@@ -40,14 +36,16 @@ def History_finder(y, m):
         instId = 'BTC-USDT',
         before = str(round(time_before * 1000)),
         after = str(round(time_after * 1000)),
-        bar = '1D'
+        bar = inter
     )
     
     data = pd.DataFrame(result['data'], columns = columns)
     data['date'] = pd.to_datetime(data['timestamp'], unit = 'ms')
+    print(data)
     data.sort_values(by='date', inplace=True)
     data[['open', 'high', 'low', 'close']] = data[['open', 'high', 'low', 'close']].apply(pd.to_numeric)
     data.drop(['volume', 'timestamp', 'confirm', 'volCcyQuote', 'volCcy'], axis=1, inplace=True)
+
     full_data = pd.concat([full_data, data])
     full_data['date'] = pd.to_datetime(full_data['date'])
     full_data['date'] = full_data['date'].dt.strftime('%Y-%m-%d')
@@ -55,9 +53,7 @@ def History_finder(y, m):
     return full_data
 
 def arima_AIC(data, p = 4, d = 4, q = 4):
-    
-    start_time = time.time()
-    
+
     # MSE
     period = 1
     L = len(data)
@@ -92,9 +88,6 @@ def arima_AIC(data, p = 4, d = 4, q = 4):
                     
                     best_pdq[2] = (i, j, k)
                     best_pdq[3] = mse
-                    
-    end_time = time.time()
-    print(f"used time : {end_time - start_time}")
     
     return best_pdq[0], best_pdq[2]
 
@@ -118,26 +111,40 @@ CORS(app)
 @app.route('/')
 def home():
 
+    full_data_one = pd.DataFrame(columns = ['open', 'high', 'low', 'close'])
+    full_data_three = pd.DataFrame(columns = ['open', 'high', 'low', 'close'])
+    # 1 day
     for m in range(8, 13):
-        full_data = History_finder(2023, m)
+        full_data_one = History_finder(2023, m, '1D', full_data_one)
 
-    full_data = History_finder(2024, 1)
+    full_data_one = History_finder(2024, 1, '1D', full_data_one)
 
-    best_pdq_AIC, best_pdq_MSE = arima_AIC(full_data['open'], 4, 4, 4)
-    print(best_pdq_MSE)
+    best_pdq_AIC_one, best_pdq_MSE_one = arima_AIC(full_data_one['open'], 4, 4, 4)
+    forecast_one, percentage_change_one = predict(full_data_one, best_pdq_MSE_one)
+    # 3 day
+    for m in range(5, 13):
+        full_data_three = History_finder(2023, m, '3D', full_data_three)
 
-    forecast, percentage_change = predict(full_data, best_pdq_MSE)
+    full_data_three = History_finder(2024, 1, '3D', full_data_three)
+
+    best_pdq_AIC_three, best_pdq_MSE_three = arima_AIC(full_data_three['open'], 4, 4, 4)
+    forecast_three, percentage_change_three = predict(full_data_three, best_pdq_MSE_three)
 
     # 整合成 JSON 物件
     result = {
-        "full_data": full_data.to_json(orient = 'records'),
+        "full_data_one": full_data_one.to_json(orient = 'records'),
+        "full_data_three": full_data_three.to_json(orient = 'records'),
         "error": {
-            "best_pdq_AIC": best_pdq_AIC,
-            "best_pdq_MSE": best_pdq_MSE
+            "best_pdq_AIC_one": best_pdq_AIC_one,
+            "best_pdq_MSE_one": best_pdq_MSE_one,
+            "best_pdq_AIC_three": best_pdq_AIC_three,
+            "best_pdq_MSE_three": best_pdq_MSE_three
         },
         "predict": {
-            "forecast": forecast.to_json(orient = 'records'),
-            "percentage_change": percentage_change
+            "forecast_one": forecast_one.to_json(orient = 'records'),
+            "forecast_three": forecast_three.to_json(orient = 'records'),
+            "percentage_change_one": percentage_change_one,
+            "percentage_change_three": percentage_change_three,
         }
     }
 
