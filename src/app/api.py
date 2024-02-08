@@ -10,6 +10,9 @@ import statsmodels.api as sm
 from datetime import datetime
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
+import warnings
+warnings.filterwarnings("ignore")
+
 columns = ['timestamp', 'open', 'high', 'low', 'close', 'volume', 'volCcy', 'volCcyQuote', 'confirm']
 date_string_after = ['2023-1-31','2023-2-28','2023-3-31','2023-4-30','2023-5-31','2023-6-30',
                      '2023-7-31','2023-8-31','2023-9-30','2023-10-31','2023-11-30','2023-12-31']
@@ -114,7 +117,7 @@ def home():
     full_data_one = pd.DataFrame(columns = ['open', 'high', 'low', 'close'])
     full_data_three = pd.DataFrame(columns = ['open', 'high', 'low', 'close'])
     # 1 day
-    for m in range(8, 13):
+    for m in range(9, 13):
         full_data_one = History_finder(2023, m, '1D', full_data_one)
 
     full_data_one = History_finder(2024, 1, '1D', full_data_one)
@@ -122,7 +125,7 @@ def home():
     best_pdq_AIC_one, best_pdq_MSE_one = arima_AIC(full_data_one['open'], 4, 4, 4)
     forecast_one, percentage_change_one = predict(full_data_one, best_pdq_MSE_one)
     # 3 day
-    for m in range(5, 13):
+    for m in range(6, 13):
         full_data_three = History_finder(2023, m, '3D', full_data_three)
 
     full_data_three = History_finder(2024, 1, '3D', full_data_three)
