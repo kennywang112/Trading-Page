@@ -14,14 +14,12 @@ export default function Home() {
   const [errorData, setErrorData] = useState(null);
   const [chartRef1, setChartRef1] = useState(null);
   const [chartRef2, setChartRef2] = useState(null);
-  const [showBigDesktop, setShowBigDesktop] = useState(true);
-  const [arimaSelected, setArimaSelected] = useState(false);
+  const [arimaSelected, setArimaSelected] = useState(true);
   const [prophetSelected, setProphetSelected] = useState(false);
 
-  const toggleBigDesktop = () => {
-    setShowBigDesktop(!showBigDesktop);
-    setArimaSelected(!showBigDesktop);
-    setProphetSelected(showBigDesktop);
+  const toggleBigDesktop = (selected) => {
+    setArimaSelected(selected === 'arima');
+    setProphetSelected(selected === 'prophet');
   };
 
   useEffect(() => {
@@ -139,16 +137,16 @@ export default function Home() {
         </div>
         {/* 按鈕 */}
         <div className="mb-4 flex justify-end button-bg">
-          <button onClick={toggleBigDesktop} className={`text-2xl font-semibold custom-font ${arimaSelected ? 'button-text-bg text-white' : ''}`}>
+        <button onClick={() => toggleBigDesktop('arima')} className={`text-2l font-semibold custom-font ${arimaSelected ? 'button-text-bg text-white' : ''}`}>
             ARIMA
           </button>
           <div style={{ width: '10px' }} />
-          <button onClick={toggleBigDesktop} className={`text-2xl font-semibold custom-font ${prophetSelected ? 'button-text-bg text-white' : ''}`}>
+          <button onClick={() => toggleBigDesktop('prophet')} className={`text-2l font-semibold custom-font ${prophetSelected ? 'button-text-bg text-white' : ''}`}>
             PROPHET
           </button>
         </div>
-        {/* 顯示 */}
-        {showBigDesktop && (
+        {/* arima */}
+        {arimaSelected && (
         <div className="bigdesktop">
           <div className="my-8"></div>
           <div className="flex justify-between w-full">
@@ -161,6 +159,159 @@ export default function Home() {
               <canvas id="stockChart2" width="600" height="400"></canvas>
             </div>
           </div>
+        <div className="my-8"></div>
+        {/* history and statistics */}
+        <div className="flex justify-between w-full">
+          {/* history */}
+          <div className="w-10% desktop">
+          <h2 className="pb-2 custom-font">1 Days</h2>
+            {apiData1 && apiData1.length > 0 ? (
+            <div className = "mt-8 overflow-y-auto" style = {{ maxHeight: '200px' }}>
+              <table>
+                <thead>
+                  <tr className = "border-b custom-font">
+                    <th>Index</th>
+                    <th>Open</th>
+                    <th>High</th>
+                    <th>Low</th>
+                    <th>Close</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {apiData1.map((item, index) => (
+                    <tr key={index}>
+                      <td className="with-border">{index}</td>
+                      <td className="with-border">{item.open}</td>
+                      <td className="with-border">{item.high}</td>
+                      <td className="with-border">{item.low}</td>
+                      <td>{item.close}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            ) : (
+              <p>stock history</p>
+            )}
+          </div>
+          <div className="w-10% desktop">
+          <h2 className="pb-2 custom-font">3 Days</h2>
+            {apiData2 && apiData2.length > 0 ? (
+            <div className = "mt-8 overflow-y-auto" style = {{ maxHeight: '200px' }}>
+              <table>
+                <thead>
+                  <tr className = "border-b custom-font">
+                    <th>Index</th>
+                    <th>Open</th>
+                    <th>High</th>
+                    <th>Low</th>
+                    <th>Close</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {apiData2.map((item, index) => (
+                    <tr key={index}>
+                      <td className="with-border">{index}</td>
+                      <td className="with-border">{item.open}</td>
+                      <td className="with-border">{item.high}</td>
+                      <td className="with-border">{item.low}</td>
+                      <td>{item.close}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            ) : (
+              <p>stock history</p>
+            )}
+          </div>
+          {/* predict */}
+          <div className="w-10% desktop">
+            <p className="pb-2 custom-font">Predict</p>
+            <div className="mt-8 overflow-y-auto" style={{ maxHeight: '200px' }}>
+              <table>
+                <thead>
+                  <tr className = "border-b custom-font">
+                    <th>Day</th>
+                    <th>Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                {predictData1 && predictData1[0].map((data, index) => (
+                  <tr key={index}>
+                    <td className = "with-border">{index}</td>
+                    <td>{data.toFixed(3)}</td>
+                  </tr>
+                ))}
+              </tbody>
+              </table>
+            </div>
+          </div>
+          {/* statistics */}
+          <div className="w-10% desktop">
+            <p className="pb-2 custom-font">Statistic Base</p>
+            <div className="mt-8 overflow-y-auto" style={{ maxHeight: '200px' }}>
+              <table>
+                <thead>
+                  <tr className = "border-b custom-font">
+                    <th>1 Day</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Best pdq AIC : </td>
+                    <td>[{errorData ? errorData.best_pdq_AIC_one : null}]</td>
+                  </tr>
+                  <tr>
+                    <td>Best pdq BIC : </td>
+                    <td>[{errorData ? errorData.best_pdq_MSE_one : null}]</td>
+                  </tr>
+                  <tr>
+                    <td>Percent ten days : </td>
+                    <td>{predictData1 ? predictData1[1].toFixed(2) : null} %</td>
+                  </tr>
+                </tbody>
+              </table>
+              <table>
+                <thead>
+                  <tr className = "border-b custom-font">
+                    <th>3 Days</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Best pdq AIC : </td>
+                    <td>[{errorData ? errorData.best_pdq_AIC_three : null}]</td>
+                  </tr>
+                  <tr>
+                    <td>Best pdq BIC : </td>
+                    <td>[{errorData ? errorData.best_pdq_MSE_three : null}]</td>
+                  </tr>
+                  <tr>
+                    <td>Percent ten days : </td>
+                    <td>{predictData2 ? predictData2[1].toFixed(2) : null} %</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        </div>
+        )}
+        {/* prophet */}
+        {prophetSelected && (
+        <div className="bigdesktop">
+        <div className="my-8"></div>
+        <div className="flex justify-between w-full">
+          <div className="w-50% custom-font">
+            1 days avg chart
+            <canvas id="stockChart" width="600" height="400"></canvas>
+          </div>
+          <div className="w-50% custom-font">
+            3 days avg chart
+            <canvas id="stockChart2" width="600" height="400"></canvas>
+          </div>
+        </div>
         <div className="my-8"></div>
         {/* history and statistics */}
         <div className="flex justify-between w-full">
