@@ -31,18 +31,26 @@ export default function Home() {
         setApiData1(JSON.parse(response.data.full_data_one));
         setPredictData1([JSON.parse(response.data.predict.forecast_one), response.data.predict.percentage_change_one]);
         const stockData_one = JSON.parse(response.data.full_data_one);
-
         setApiData2(JSON.parse(response.data.full_data_three));
         setPredictData2([JSON.parse(response.data.predict.forecast_three), response.data.predict.percentage_change_three]);
         const stockData_three = JSON.parse(response.data.full_data_three);
 
         setErrorData(response.data.error);
-        
         // get dates and prices
         const dates_one = stockData_one.map(entry => new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }));
         const prices_one = stockData_one.map(entry => entry.close);
         const dates_three = stockData_three.map(entry => new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }));
         const prices_three = stockData_three.map(entry => entry.close);
+
+        let dates_ten_days_later = [];
+        let lastDateStr = dates_one[dates_one.length - 1];
+        let newDate = new Date(lastDateStr);
+        for (let i = 1; i <= 10; i++) {
+          newDate.setDate(newDate.getDate() + i);
+          dates_ten_days_later.push(newDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }));
+        }
+        const combinedArray1 = [...prices_one, ...JSON.parse(response.data.predict.forecast_one)];
+
         // Chart.js
         const ctx1 = document.getElementById('stockChart').getContext('2d');
         const ctx2 = document.getElementById('stockChart2').getContext('2d');
@@ -58,12 +66,15 @@ export default function Home() {
         const newChartRef1 = new Chart(ctx1, {
           type: 'line',
           data: {
-            labels: dates_one,
+            labels: [...dates_one, ...dates_ten_days_later],
             datasets: [{
-              label: 'price',
-              borderColor: 'rgb(75, 192, 192)',
-              data: prices_one,
-            }],
+              label: 'origin',
+              borderColor: (context) => {
+                const lastIndex = context.dataset.data.length - 1;
+                return context.dataIndex > lastIndex - 10 ? 'rgb(75, 192, 192)' : 'rgb(73, 99, 80)';
+              },
+              data: combinedArray1,
+            }]
           },
           options: {
             scales: {
@@ -128,6 +139,7 @@ export default function Home() {
   }, []);
 
   return (
+    
     <main className="flex flex-col items-center p-8 h-screen">
       <section className="flex flex-col items-center justify-center p-8 w-full">        
         <div className="mb-4 flex justify-start w-full">
@@ -151,7 +163,7 @@ export default function Home() {
           <div className="my-8"></div>
           <div className="flex justify-between w-full">
             <div className="w-50% custom-font">
-              1 days avg chart
+              1 day avg chart
               <canvas id="stockChart" width="600" height="400"></canvas>
             </div>
             <div className="w-50% custom-font">
@@ -164,9 +176,9 @@ export default function Home() {
         <div className="flex justify-between w-full">
           {/* history */}
           <div className="w-10% desktop">
-          <h2 className="pb-2 custom-font">1 Days</h2>
+          <h2 className="pb-2 custom-font">1 Day</h2>
             {apiData1 && apiData1.length > 0 ? (
-            <div className = "mt-8 overflow-y-auto" style = {{ maxHeight: '200px' }}>
+            <div className = "mt-8 overflow-y-auto table-container" style = {{ maxHeight: '200px' }}>
               <table>
                 <thead>
                   <tr className = "border-b custom-font">
@@ -197,7 +209,7 @@ export default function Home() {
           <div className="w-10% desktop">
           <h2 className="pb-2 custom-font">3 Days</h2>
             {apiData2 && apiData2.length > 0 ? (
-            <div className = "mt-8 overflow-y-auto" style = {{ maxHeight: '200px' }}>
+            <div className = "mt-8 overflow-y-auto table-container" style = {{ maxHeight: '200px' }}>
               <table>
                 <thead>
                   <tr className = "border-b custom-font">
@@ -228,7 +240,7 @@ export default function Home() {
           {/* predict */}
           <div className="w-10% desktop">
             <p className="pb-2 custom-font">Predict</p>
-            <div className="mt-8 overflow-y-auto" style={{ maxHeight: '200px' }}>
+            <div className="mt-8 overflow-y-auto table-container" style={{ maxHeight: '200px' }}>
               <table>
                 <thead>
                   <tr className = "border-b custom-font">
@@ -250,7 +262,7 @@ export default function Home() {
           {/* statistics */}
           <div className="w-10% desktop">
             <p className="pb-2 custom-font">Statistic Base</p>
-            <div className="mt-8 overflow-y-auto" style={{ maxHeight: '200px' }}>
+            <div className="mt-8 overflow-y-auto table-container" style={{ maxHeight: '200px' }}>
               <table>
                 <thead>
                   <tr className = "border-b custom-font">
@@ -304,7 +316,7 @@ export default function Home() {
         <div className="my-8"></div>
         <div className="flex justify-between w-full">
           <div className="w-50% custom-font">
-            1 days avg chart
+            1 day avg chart
             <canvas id="stockChart" width="600" height="400"></canvas>
           </div>
           <div className="w-50% custom-font">
@@ -317,9 +329,9 @@ export default function Home() {
         <div className="flex justify-between w-full">
           {/* history */}
           <div className="w-10% desktop">
-          <h2 className="pb-2 custom-font">1 Days</h2>
+          <h2 className="pb-2 custom-font">1 Day</h2>
             {apiData1 && apiData1.length > 0 ? (
-            <div className = "mt-8 overflow-y-auto" style = {{ maxHeight: '200px' }}>
+            <div className = "mt-8 overflow-y-auto table-container" style = {{ maxHeight: '200px' }}>
               <table>
                 <thead>
                   <tr className = "border-b custom-font">
@@ -350,7 +362,7 @@ export default function Home() {
           <div className="w-10% desktop">
           <h2 className="pb-2 custom-font">3 Days</h2>
             {apiData2 && apiData2.length > 0 ? (
-            <div className = "mt-8 overflow-y-auto" style = {{ maxHeight: '200px' }}>
+            <div className = "mt-8 overflow-y-auto table-container" style = {{ maxHeight: '200px' }}>
               <table>
                 <thead>
                   <tr className = "border-b custom-font">
@@ -381,7 +393,7 @@ export default function Home() {
           {/* predict */}
           <div className="w-10% desktop">
             <p className="pb-2 custom-font">Predict</p>
-            <div className="mt-8 overflow-y-auto" style={{ maxHeight: '200px' }}>
+            <div className="mt-8 overflow-y-auto table-container" style={{ maxHeight: '200px' }}>
               <table>
                 <thead>
                   <tr className = "border-b custom-font">
@@ -403,7 +415,7 @@ export default function Home() {
           {/* statistics */}
           <div className="w-10% desktop">
             <p className="pb-2 custom-font">Statistic Base</p>
-            <div className="mt-8 overflow-y-auto" style={{ maxHeight: '200px' }}>
+            <div className="mt-8 overflow-y-auto table-container" style={{ maxHeight: '200px' }}>
               <table>
                 <thead>
                   <tr className = "border-b custom-font">

@@ -91,3 +91,15 @@ section {
   background-color: hsla(28, 34%, 50%, 0.471);
   border-radius: 10px;
 }
+
+.table-container {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.table-container thead {
+  position: sticky;
+  top: 0;
+  background-color: rgb(141, 101, 67);
+  z-index: 1; /* Ensures the header stays above the scrolling content */
+}

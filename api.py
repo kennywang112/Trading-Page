@@ -117,7 +117,7 @@ def home():
     full_data_one = pd.DataFrame(columns = ['open', 'high', 'low', 'close'])
     full_data_three = pd.DataFrame(columns = ['open', 'high', 'low', 'close'])
     # 1 day
-    for m in range(9, 13):
+    for m in range(11, 13):
         full_data_one = History_finder(2023, m, '1D', full_data_one)
 
     full_data_one = History_finder(2024, 1, '1D', full_data_one)
@@ -125,7 +125,7 @@ def home():
     best_pdq_AIC_one, best_pdq_MSE_one = arima_AIC(full_data_one['open'], 4, 4, 4)
     forecast_one, percentage_change_one = predict(full_data_one, best_pdq_MSE_one)
     # 3 day
-    for m in range(6, 13):
+    for m in range(8, 13):
         full_data_three = History_finder(2023, m, '3D', full_data_three)
 
     full_data_three = History_finder(2024, 1, '3D', full_data_three)
