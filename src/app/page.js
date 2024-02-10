@@ -30,17 +30,17 @@ export default function Home() {
         
         setApiData1(JSON.parse(response.data.full_data_one));
         setPredictData1([JSON.parse(response.data.predict.forecast_one), response.data.predict.percentage_change_one]);
-        const stockData_one = JSON.parse(response.data.full_data_one);
+        const stockData_one = await JSON.parse(response.data.full_data_one);
         setApiData2(JSON.parse(response.data.full_data_three));
         setPredictData2([JSON.parse(response.data.predict.forecast_three), response.data.predict.percentage_change_three]);
-        const stockData_three = JSON.parse(response.data.full_data_three);
+        const stockData_three = await JSON.parse(response.data.full_data_three);
 
         setErrorData(response.data.error);
         // get dates and prices
-        const dates_one = stockData_one.map(entry => new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }));
-        const prices_one = stockData_one.map(entry => entry.close);
-        const dates_three = stockData_three.map(entry => new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }));
-        const prices_three = stockData_three.map(entry => entry.close);
+        const dates_one = await stockData_one.map(entry => new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }));
+        const prices_one = await stockData_one.map(entry => entry.close);
+        const dates_three = await stockData_three.map(entry => new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }));
+        const prices_three = await stockData_three.map(entry => entry.close);
 
         let dates1_ten_days_later = [];
         let dates3_ten_days_later = [];
@@ -65,7 +65,7 @@ export default function Home() {
         if (chartRef2) {
           await chartRef2.destroy();
         }
-        Chart.defaults.color = "rgb(75, 192, 192)";
+        Chart.defaults.color = "rgb(39, 54, 43)";
         const newChartRef1 = new Chart(ctx1, {
           type: 'line',
           data: {
@@ -74,7 +74,7 @@ export default function Home() {
               label: 'origin',
               borderColor: (context) => {
                 const lastIndex = context.dataset.data.length - 1;
-                return context.dataIndex > lastIndex - 10 ? 'rgb(75, 192, 192)' : 'rgb(73, 99, 80)';
+                return context.dataIndex > lastIndex - 10 ? 'rgb(75, 192, 192)' : 'rgb(39, 54, 43)';
               },
               data: combinedArray1,
             }]
@@ -108,7 +108,7 @@ export default function Home() {
               label: 'originprice',
               borderColor: (context) => {
                 const lastIndex = context.dataset.data.length - 1;
-                return context.dataIndex > lastIndex - 10 ? 'rgb(75, 192, 192)' : 'rgb(73, 99, 80)';
+                return context.dataIndex > lastIndex - 10 ? 'rgb(75, 192, 192)' : 'rgb(39, 54, 43)';
               },
               data: combinedArray3,
             }],
@@ -147,21 +147,30 @@ export default function Home() {
   return (
     
     <main className="flex flex-col items-center p-8 h-screen">
-      <section className="flex flex-col items-center justify-center p-8 w-full">        
+      <section className="flex flex-col items-center justify-center p-8 w-full">
         <div className="mb-4 flex justify-start w-full">
-          <label htmlFor="selectOption" className="text-2xl font-semibold custom-font">
+          <label htmlFor="selectOption" className="text-2xl font-semibold custom-font" style={{fontSize: '28px'}}>
             StoneTrader
           </label>
+        <div style={{width: '20px'}}></div>
+        <div>
+        <select className="form-select select-button custom-font" id="crypto-select" style={{fontSize: '20px'}}>
+          <option value="BTC">BTC</option>
+          <option value="SOL">SOL</option>
+        </select>
         </div>
+      </div>
         {/* 按鈕 */}
-        <div className="mb-4 flex justify-end button-bg">
-        <button onClick={() => toggleBigDesktop('arima')} className={`text-2l font-semibold custom-font ${arimaSelected ? 'button-text-bg text-white' : ''}`}>
-            ARIMA
-          </button>
-          <div style={{ width: '10px' }} />
-          <button onClick={() => toggleBigDesktop('prophet')} className={`text-2l font-semibold custom-font ${prophetSelected ? 'button-text-bg text-white' : ''}`}>
-            PROPHET
-          </button>
+        <div className="mb-4 flex justify-between items-center button-bg">
+          <div className="flex">
+            <button onClick={() => toggleBigDesktop('arima')} className={`text-2l font-semibold custom-font ${arimaSelected ? 'button-text-bg text-white' : ''}`}>
+              ARIMA
+            </button>
+            <div style={{ width: '10px' }} />
+            <button onClick={() => toggleBigDesktop('prophet')} className={`text-2l font-semibold custom-font ${prophetSelected ? 'button-text-bg text-white' : ''}`}>
+              PROPHET
+            </button>
+          </div>
         </div>
         {/* arima */}
         {arimaSelected && (
@@ -184,10 +193,10 @@ export default function Home() {
           <div className="w-10% desktop">
           <h2 className="pb-2 custom-font">1 Day</h2>
             {apiData1 && apiData1.length > 0 ? (
-            <div className = "mt-8 overflow-y-auto table-container" style = {{ maxHeight: '200px' }}>
+            <div className = "mt-8 overflow-y-auto table-container" style = {{ maxHeight: '250px' }}>
               <table>
                 <thead>
-                  <tr className = "border-b custom-font">
+                  <tr className = "custom-font">
                     <th>Index</th>
                     <th>Open</th>
                     <th>High</th>
@@ -215,10 +224,10 @@ export default function Home() {
           <div className="w-10% desktop">
           <h2 className="pb-2 custom-font">3 Days</h2>
             {apiData2 && apiData2.length > 0 ? (
-            <div className = "mt-8 overflow-y-auto table-container" style = {{ maxHeight: '200px' }}>
+            <div className = "mt-8 overflow-y-auto table-container" style = {{ maxHeight: '250px' }}>
               <table>
                 <thead>
-                  <tr className = "border-b custom-font">
+                  <tr className = "custom-font">
                     <th>Index</th>
                     <th>Open</th>
                     <th>High</th>
@@ -246,10 +255,10 @@ export default function Home() {
           {/* predict */}
           <div className="w-10% desktop">
             <p className="pb-2 custom-font">Predict</p>
-            <div className="mt-8 overflow-y-auto table-container" style={{ maxHeight: '200px' }}>
+            <div className="mt-8 overflow-y-auto table-container" style={{ maxHeight: '250px' }}>
               <table>
                 <thead>
-                  <tr className = "border-b custom-font">
+                  <tr className = "custom-font">
                     <th>Day</th>
                     <th>Price</th>
                   </tr>
@@ -290,6 +299,8 @@ export default function Home() {
                   </tr>
                 </tbody>
               </table>
+            </div>
+            <div className="mt-8 overflow-y-auto table-container" style={{ maxHeight: '200px' }}>
               <table>
                 <thead>
                   <tr className = "custom-font">
@@ -340,7 +351,7 @@ export default function Home() {
             <div className = "mt-8 overflow-y-auto table-container" style = {{ maxHeight: '200px' }}>
               <table>
                 <thead>
-                  <tr className = "border-b custom-font">
+                  <tr className = "custom-font">
                     <th>Index</th>
                     <th>Open</th>
                     <th>High</th>
@@ -371,7 +382,7 @@ export default function Home() {
             <div className = "mt-8 overflow-y-auto table-container" style = {{ maxHeight: '200px' }}>
               <table>
                 <thead>
-                  <tr className = "border-b custom-font">
+                  <tr className = "custom-font">
                     <th>Index</th>
                     <th>Open</th>
                     <th>High</th>
@@ -402,7 +413,7 @@ export default function Home() {
             <div className="mt-8 overflow-y-auto table-container" style={{ maxHeight: '200px' }}>
               <table>
                 <thead>
-                  <tr className = "border-b custom-font">
+                  <tr className = "custom-font">
                     <th>Day</th>
                     <th>Price</th>
                   </tr>
@@ -424,7 +435,7 @@ export default function Home() {
             <div className="mt-8 overflow-y-auto table-container" style={{ maxHeight: '200px' }}>
               <table>
                 <thead>
-                  <tr className = "border-b custom-font">
+                  <tr className = "custom-font">
                     <th>1 Day</th>
                   </tr>
                 </thead>
@@ -445,7 +456,7 @@ export default function Home() {
               </table>
               <table>
                 <thead>
-                  <tr className = "border-b custom-font">
+                  <tr className = "custom-font">
                     <th>3 Days</th>
                   </tr>
                 </thead>

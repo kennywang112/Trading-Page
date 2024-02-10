@@ -71,12 +71,11 @@ section {
 }
 
 .with-border {
-  border-right: 1px solid #ddd; /* 右边框 */
+  border-right: 1px solid #ddd;
 }
 
 .custom-font {
   font-family: "Times New Roman", Times, serif;
-  /* 您的其他自定义字体样式 */
 }
 
 .button-text-bg {
@@ -102,4 +101,10 @@ section {
   top: 0;
   background-color: rgb(141, 101, 67);
   z-index: 1; /* Ensures the header stays above the scrolling content */
+}
+
+.select-button {
+  padding: 2px 10px 2px 10px;
+  background-color: hsla(28, 33%, 28%, 0.471);
+  border-radius: 10px;
 }
