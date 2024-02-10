@@ -154,12 +154,50 @@ export default function Home() {
           </label>
         <div style={{width: '20px'}}></div>
         <div>
-        <select className="form-select select-button custom-font" id="crypto-select" style={{fontSize: '20px'}}>
-          <option value="BTC">BTC</option>
-          <option value="SOL">SOL</option>
-        </select>
+          <select className="form-select select-button custom-font" id="crypto-select" style={{fontSize: '20px'}}>
+            <option value="BTC">BTC</option>
+            <option value="SOL">SOL</option>
+          </select>
         </div>
-      </div>
+        <div className="flex justify-end items-center flex-grow">
+          <a href="https://github.com/kennywang112">
+          <Image
+            src="/github.ico"
+            alt="github"
+            className="dark:invert"
+            width={30}
+            height={24}
+            priority
+          /></a>
+          <a href="https://www.kaggle.com/kennyssss/code">
+          <Image
+            src="/website.ico"
+            alt="website"
+            className="dark"
+            width={30}
+            height={24}
+            priority
+          /></a>
+          <a href="https://www.linkedin.com/in/%E7%A5%81%E9%A8%AB-%E7%8E%8B-928017243/">
+          <Image
+            src="/linkedin.ico"
+            alt="linkedin"
+            className="dark"
+            width={30}
+            height={24}
+            priority
+          /></a>
+          <a href="https://www.kaggle.com/kennyssss/code">
+          <Image
+            src="/kaggle.ico"
+            alt="kaggle"
+            className="dark"
+            width={30}
+            height={24}
+            priority
+          /></a>
+        </div>
+        </div>
         {/* 按鈕 */}
         <div className="mb-4 flex justify-between items-center button-bg">
           <div className="flex">
@@ -254,7 +292,28 @@ export default function Home() {
           </div>
           {/* predict */}
           <div className="w-10% desktop">
-            <p className="pb-2 custom-font">Predict</p>
+            <p className="pb-2 custom-font">Predict 1</p>
+            <div className="mt-8 overflow-y-auto table-container" style={{ maxHeight: '250px' }}>
+              <table>
+                <thead>
+                  <tr className = "custom-font">
+                    <th>Day</th>
+                    <th>Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                {predictData1 && predictData1[0].map((data, index) => (
+                  <tr key={index}>
+                    <td className = "with-border">{index}</td>
+                    <td>{data.toFixed(3)}</td>
+                  </tr>
+                ))}
+              </tbody>
+              </table>
+            </div>
+          </div>
+          <div className="w-10% desktop">
+            <p className="pb-2 custom-font">Predict 3</p>
             <div className="mt-8 overflow-y-auto table-container" style={{ maxHeight: '250px' }}>
               <table>
                 <thead>
