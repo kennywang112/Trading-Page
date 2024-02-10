@@ -42,14 +42,17 @@ export default function Home() {
         const dates_three = stockData_three.map(entry => new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }));
         const prices_three = stockData_three.map(entry => entry.close);
 
-        let dates_ten_days_later = [];
+        let dates1_ten_days_later = [];
+        let dates3_ten_days_later = [];
         let lastDateStr = dates_one[dates_one.length - 1];
         let newDate = new Date(lastDateStr);
         for (let i = 1; i <= 10; i++) {
           newDate.setDate(newDate.getDate() + i);
-          dates_ten_days_later.push(newDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }));
+          dates1_ten_days_later.push(newDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }));
+          dates3_ten_days_later.push(newDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }));
         }
         const combinedArray1 = [...prices_one, ...JSON.parse(response.data.predict.forecast_one)];
+        const combinedArray3 = [...prices_three, ...JSON.parse(response.data.predict.forecast_three)];
 
         // Chart.js
         const ctx1 = document.getElementById('stockChart').getContext('2d');
@@ -66,7 +69,7 @@ export default function Home() {
         const newChartRef1 = new Chart(ctx1, {
           type: 'line',
           data: {
-            labels: [...dates_one, ...dates_ten_days_later],
+            labels: [...dates_one, ...dates1_ten_days_later],
             datasets: [{
               label: 'origin',
               borderColor: (context) => {
@@ -100,11 +103,14 @@ export default function Home() {
         const newChartRef2 = new Chart(ctx2, {
           type: 'line',
           data: {
-            labels: dates_three,
+            labels: [...dates_three, ...dates3_ten_days_later],
             datasets: [{
-              label: 'price',
-              borderColor: 'rgb(75, 192, 192)',
-              data: prices_three,
+              label: 'originprice',
+              borderColor: (context) => {
+                const lastIndex = context.dataset.data.length - 1;
+                return context.dataIndex > lastIndex - 10 ? 'rgb(75, 192, 192)' : 'rgb(73, 99, 80)';
+              },
+              data: combinedArray3,
             }],
           },
           options: {
@@ -265,7 +271,7 @@ export default function Home() {
             <div className="mt-8 overflow-y-auto table-container" style={{ maxHeight: '200px' }}>
               <table>
                 <thead>
-                  <tr className = "border-b custom-font">
+                  <tr className = "custom-font">
                     <th>1 Day</th>
                   </tr>
                 </thead>
@@ -286,7 +292,7 @@ export default function Home() {
               </table>
               <table>
                 <thead>
-                  <tr className = "border-b custom-font">
+                  <tr className = "custom-font">
                     <th>3 Days</th>
                   </tr>
                 </thead>
