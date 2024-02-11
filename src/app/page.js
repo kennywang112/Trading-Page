@@ -149,6 +149,15 @@ export default function Home() {
     <main className="flex flex-col items-center p-8 h-screen">
       <section className="flex flex-col items-center justify-center p-8 w-full">
         <div className="mb-4 flex justify-start w-full">
+        <a href="https://github.com/kennywang112">
+          <Image
+            src="/favicon.ico"
+            alt="favicon"
+            className="dark"
+            width={30}
+            height={24}
+            priority
+          /></a>
           <label htmlFor="selectOption" className="text-2xl font-semibold custom-font" style={{fontSize: '28px'}}>
             StoneTrader
           </label>
