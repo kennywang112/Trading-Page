@@ -23,30 +23,30 @@ export default function Home() {
   const toggleBigDesktop = (selected) => {
     setArimaSelected(selected === 'arima');
     setProphetSelected(selected === 'prophet');
+    console.log(selected)
   };
   const handleCryptoChange = (event) => {
     setSelectedCrypto(event.target.value);
-    console.log(event.target.value)
+    console.log(event)
   };
   const dayChange = (selected) => {
     selectday1(selected === 'day1');
     selectday3(selected === 'day3');
+    console.log(selected)
   };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Use a relative path instead of an absolute URL
-        // const response = await axios.get("http://127.0.0.1:5000/");
+        let newchartRef1, newchartRef2;
         const response = (await axios.get(`http://127.0.0.1:5000/?instId=${selectedCrypto}-USDT`));
-        
+
         setApiData1(JSON.parse(response.data.full_data_one));
         setPredictData1([JSON.parse(response.data.predict.forecast_one), response.data.predict.percentage_change_one]);
         const stockData_one = await JSON.parse(response.data.full_data_one);
         setApiData2(JSON.parse(response.data.full_data_three));
         setPredictData2([JSON.parse(response.data.predict.forecast_three), response.data.predict.percentage_change_three]);
         const stockData_three = await JSON.parse(response.data.full_data_three);
-
         setErrorData(response.data.error);
         // get dates and prices
         const dates_one = await stockData_one.map(entry => new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }));
@@ -65,22 +65,15 @@ export default function Home() {
         }
         const combinedArray1 = [...prices_one, ...JSON.parse(response.data.predict.forecast_one)];
         const combinedArray3 = [...prices_three, ...JSON.parse(response.data.predict.forecast_three)];
-
-        // Chart.js
-        const ctx1 = document.getElementById('stockChart');//.getContext('2d');
-        const ctx2 = document.getElementById('stockChart2');//.getContext('2d');
-
-        // Destroy previous chart instances
-        if (chartRef1) {
-          await chartRef1.destroy();
-        }
-        if (chartRef2) {
-          await chartRef2.destroy();
-        }
+        const ctx1 = document.getElementById('stockChart');
+        const ctx2 = document.getElementById('stockChart2');
         Chart.defaults.color = "rgb(39, 54, 43)";
 
-        if (ctx1) {
-          var newChartRef1 = new Chart(ctx1.getContext('2d'), {
+        console.log(ctx1 && chartRef1 == null)
+        console.log(ctx2 && chartRef2 == null)
+
+        if (ctx1 && chartRef1 == null) {
+          newchartRef1 = new Chart(ctx1.getContext('2d'), {
             type: 'line',
             data: {
               labels: [...dates_one, ...dates1_ten_days_later],
@@ -114,8 +107,8 @@ export default function Home() {
               },
             },
           });
-        } else if (ctx2) {
-          var newChartRef2 = new Chart(ctx2.getContext('2d'), {
+        } else if (ctx2 && chartRef2 == null) {
+          newchartRef2 = new Chart(ctx2.getContext('2d'), {
             type: 'line',
             data: {
               labels: [...dates_three, ...dates3_ten_days_later],
@@ -150,9 +143,9 @@ export default function Home() {
             },
           });
         }
-        setChartRef1(newChartRef1);
-        setChartRef2(newChartRef2);
-
+        setChartRef1(newchartRef1);
+        setChartRef2(newchartRef2);
+        console.log('finish')
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -161,7 +154,6 @@ export default function Home() {
   }, [selectedCrypto]);
 
   return (
-    
     <main className="flex flex-col items-center p-8 h-screen">
       <section className="flex flex-col items-center justify-center p-8 w-full">
         <div className="mb-4 flex justify-start w-full">
@@ -194,7 +186,7 @@ export default function Home() {
             height={24}
             priority
           /></a>
-          <a href="https://www.kaggle.com/kennyssss/code">
+          <a href="https://kennywang112.github.io/Profile/">
           <Image
             src="/website.ico"
             alt="website"
@@ -314,11 +306,6 @@ export default function Home() {
             <p className="pb-2 custom-font">Statistic Base</p>
             <div className="mt-8 overflow-y-auto table-container" style={{ maxHeight: '200px' }}>
               <table>
-                <thead>
-                  <tr className = "custom-font">
-                    <th>1 Day</th>
-                  </tr>
-                </thead>
                 <tbody>
                   <tr>
                     <td>Best pdq AIC : </td>
@@ -401,11 +388,6 @@ export default function Home() {
             <p className="pb-2 custom-font">Statistic Base</p>
             <div className="mt-8 overflow-y-auto table-container" style={{ maxHeight: '200px' }}>
               <table>
-                <thead>
-                  <tr className = "custom-font">
-                    <th>3 Days</th>
-                  </tr>
-                </thead>
                 <tbody>
                   <tr>
                     <td>Best pdq AIC : </td>
@@ -584,5 +566,4 @@ export default function Home() {
       </section>
     </main>
   );
-  
 }
