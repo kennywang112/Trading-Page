@@ -16,11 +16,21 @@ export default function Home() {
   const [chartRef2, setChartRef2] = useState(null);
   const [arimaSelected, setArimaSelected] = useState(true);
   const [prophetSelected, setProphetSelected] = useState(false);
+  const [day1selected, selectday1] = useState(true);
+  const [day3selected, selectday3] = useState(false);
   const [selectedCrypto, setSelectedCrypto] = useState('BTC');
 
   const toggleBigDesktop = (selected) => {
     setArimaSelected(selected === 'arima');
     setProphetSelected(selected === 'prophet');
+  };
+  const handleCryptoChange = (event) => {
+    setSelectedCrypto(event.target.value);
+    console.log(event.target.value)
+  };
+  const dayChange = (selected) => {
+    selectday1(selected === 'day1');
+    selectday3(selected === 'day3');
   };
 
   useEffect(() => {
@@ -57,8 +67,8 @@ export default function Home() {
         const combinedArray3 = [...prices_three, ...JSON.parse(response.data.predict.forecast_three)];
 
         // Chart.js
-        const ctx1 = document.getElementById('stockChart').getContext('2d');
-        const ctx2 = document.getElementById('stockChart2').getContext('2d');
+        const ctx1 = document.getElementById('stockChart');//.getContext('2d');
+        const ctx2 = document.getElementById('stockChart2');//.getContext('2d');
 
         // Destroy previous chart instances
         if (chartRef1) {
@@ -68,74 +78,78 @@ export default function Home() {
           await chartRef2.destroy();
         }
         Chart.defaults.color = "rgb(39, 54, 43)";
-        const newChartRef1 = new Chart(ctx1, {
-          type: 'line',
-          data: {
-            labels: [...dates_one, ...dates1_ten_days_later],
-            datasets: [{
-              label: 'origin',
-              borderColor: (context) => {
-                const lastIndex = context.dataset.data.length - 1;
-                return context.dataIndex > lastIndex - 10 ? 'rgb(75, 192, 192)' : 'rgb(39, 54, 43)';
-              },
-              data: combinedArray1,
-            }]
-          },
-          options: {
-            scales: {
-              x: [{
-                type: 'time',
-                time: {
-                  unit: 'day',
+
+        if (ctx1) {
+          var newChartRef1 = new Chart(ctx1.getContext('2d'), {
+            type: 'line',
+            data: {
+              labels: [...dates_one, ...dates1_ten_days_later],
+              datasets: [{
+                label: 'origin',
+                borderColor: (context) => {
+                  const lastIndex = context.dataset.data.length - 1;
+                  return context.dataIndex > lastIndex - 10 ? 'rgb(75, 192, 192)' : 'rgb(39, 54, 43)';
                 },
-                scaleLabel: {
-                  display: true,
-                  text: 'date',
-                },
-              }],
-              y: {
-                scaleLabel: {
-                  display: true,
-                  text: 'price',
-                },
-              },
+                data: combinedArray1,
+              }]
             },
-          },
-        });
-        const newChartRef2 = new Chart(ctx2, {
-          type: 'line',
-          data: {
-            labels: [...dates_three, ...dates3_ten_days_later],
-            datasets: [{
-              label: 'originprice',
-              borderColor: (context) => {
-                const lastIndex = context.dataset.data.length - 1;
-                return context.dataIndex > lastIndex - 10 ? 'rgb(75, 192, 192)' : 'rgb(39, 54, 43)';
-              },
-              data: combinedArray3,
-            }],
-          },
-          options: {
-            scales: {
-              x: [{
-                type: 'time',
-                time: {
-                  unit: 'day',
-                },
-                scaleLabel: {
-                  display: true,
-                  text: 'date',
-                },
+            options: {
+              scales: {
+                x: [{
+                  type: 'time',
+                  time: {
+                    unit: 'day',
+                  },
+                  scaleLabel: {
+                    display: true,
+                    text: 'date',
+                  },
                 }],
-              y: {
-                scaleLabel: {
-                  display: true,
-                  text: 'price',
+                y: {
+                  scaleLabel: {
+                    display: true,
+                    text: 'price',
+                  },
                 },
               },
             },
-          },
-        });
+          });
+        } else if (ctx2) {
+          var newChartRef2 = new Chart(ctx2.getContext('2d'), {
+            type: 'line',
+            data: {
+              labels: [...dates_three, ...dates3_ten_days_later],
+              datasets: [{
+                label: 'originprice',
+                borderColor: (context) => {
+                  const lastIndex = context.dataset.data.length - 1;
+                  return context.dataIndex > lastIndex - 10 ? 'rgb(75, 192, 192)' : 'rgb(39, 54, 43)';
+                },
+                data: combinedArray3,
+              }],
+            },
+            options: {
+              scales: {
+                x: [{
+                  type: 'time',
+                  time: {
+                    unit: 'day',
+                  },
+                  scaleLabel: {
+                    display: true,
+                    text: 'date',
+                  },
+                  }],
+                y: {
+                  scaleLabel: {
+                    display: true,
+                    text: 'price',
+                  },
+                },
+              },
+            },
+          });
+        }
         setChartRef1(newChartRef1);
         setChartRef2(newChartRef2);
 
@@ -145,11 +159,6 @@ export default function Home() {
     };
     fetchData();
   }, [selectedCrypto]);
-
-  const handleCryptoChange = (event) => {
-    setSelectedCrypto(event.target.value);
-    console.log(event.target.value)
-  };
 
   return (
     
@@ -229,23 +238,27 @@ export default function Home() {
         {/* arima */}
         {arimaSelected && (
         <div className="bigdesktop">
-          <div className="my-8"></div>
-          <div className="flex justify-between w-full">
-            <div className="w-50% custom-font">
-              1 day avg chart
-              <canvas id="stockChart" width="600" height="400"></canvas>
-            </div>
-            <div className="w-50% custom-font">
-              3 days avg chart
-              <canvas id="stockChart2" width="600" height="400"></canvas>
-            </div>
+          <div className="flex">
+            <button onClick={() => dayChange('day1')} className={`text-2l font-semibold custom-font ${day1selected ? 'button-text-bg text-white' : ''}`}>
+              Day 1
+            </button>
+            <div style={{ width: '10px' }} />
+            <button onClick={() => dayChange('day3')} className={`text-2l font-semibold custom-font ${day3selected ? 'button-text-bg text-white' : ''}`}>
+              Day 3
+            </button>
           </div>
+          <div className="my-8"></div>
         <div className="my-8"></div>
         {/* history and statistics */}
+        {day1selected && (
+        <div><div className="flex justify-between w-full">
+          <div className="w-100% custom-font">
+            <canvas id="stockChart" width="750" height="400"></canvas>
+          </div>
+        </div>
         <div className="flex justify-between w-full">
           {/* history */}
           <div className="w-10% desktop">
-          <h2 className="pb-2 custom-font">1 Day</h2>
             {apiData1 && apiData1.length > 0 ? (
             <div className = "mt-8 overflow-y-auto table-container" style = {{ maxHeight: '250px' }}>
               <table>
@@ -275,61 +288,8 @@ export default function Home() {
               <p>stock history</p>
             )}
           </div>
-          <div className="w-10% desktop">
-          <h2 className="pb-2 custom-font">3 Days</h2>
-            {apiData2 && apiData2.length > 0 ? (
-            <div className = "mt-8 overflow-y-auto table-container" style = {{ maxHeight: '250px' }}>
-              <table>
-                <thead>
-                  <tr className = "custom-font">
-                    <th>Index</th>
-                    <th>Open</th>
-                    <th>High</th>
-                    <th>Low</th>
-                    <th>Close</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {apiData2.map((item, index) => (
-                    <tr key={index}>
-                      <td className="with-border">{index}</td>
-                      <td className="with-border">{item.open}</td>
-                      <td className="with-border">{item.high}</td>
-                      <td className="with-border">{item.low}</td>
-                      <td>{item.close}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            ) : (
-              <p>stock history</p>
-            )}
-          </div>
           {/* predict */}
           <div className="w-10% desktop">
-            <p className="pb-2 custom-font">Predict 1</p>
-            <div className="mt-8 overflow-y-auto table-container" style={{ maxHeight: '250px' }}>
-              <table>
-                <thead>
-                  <tr className = "custom-font">
-                    <th>Day</th>
-                    <th>Price</th>
-                  </tr>
-                </thead>
-                <tbody>
-                {predictData1 && predictData1[0].map((data, index) => (
-                  <tr key={index}>
-                    <td className = "with-border">{index}</td>
-                    <td>{data.toFixed(3)}</td>
-                  </tr>
-                ))}
-              </tbody>
-              </table>
-            </div>
-          </div>
-          <div className="w-10% desktop">
-            <p className="pb-2 custom-font">Predict 3</p>
             <div className="mt-8 overflow-y-auto table-container" style={{ maxHeight: '250px' }}>
               <table>
                 <thead>
@@ -375,6 +335,70 @@ export default function Home() {
                 </tbody>
               </table>
             </div>
+          </div>
+        </div></div>
+        )}
+        {day3selected && (
+        <div><div className="flex justify-between w-full">
+          <div className="w-100% custom-font">
+            <canvas id="stockChart2" width="750" height="400"></canvas>
+        </div></div>
+        <div className="flex justify-between w-full">
+          {/* history */}
+          <div className="w-10% desktop">
+            {apiData2 && apiData2.length > 0 ? (
+            <div className = "mt-8 overflow-y-auto table-container" style = {{ maxHeight: '250px' }}>
+              <table>
+                <thead>
+                  <tr className = "custom-font">
+                    <th>Index</th>
+                    <th>Open</th>
+                    <th>High</th>
+                    <th>Low</th>
+                    <th>Close</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {apiData2.map((item, index) => (
+                    <tr key={index}>
+                      <td className="with-border">{index}</td>
+                      <td className="with-border">{item.open}</td>
+                      <td className="with-border">{item.high}</td>
+                      <td className="with-border">{item.low}</td>
+                      <td>{item.close}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            ) : (
+              <p>stock history</p>
+            )}
+          </div>
+          {/* predict */}
+          <div className="w-10% desktop">
+            <div className="mt-8 overflow-y-auto table-container" style={{ maxHeight: '250px' }}>
+              <table>
+                <thead>
+                  <tr className = "custom-font">
+                    <th>Day</th>
+                    <th>Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                {predictData1 && predictData1[0].map((data, index) => (
+                  <tr key={index}>
+                    <td className = "with-border">{index}</td>
+                    <td>{data.toFixed(3)}</td>
+                  </tr>
+                ))}
+              </tbody>
+              </table>
+            </div>
+          </div>
+          {/* statistics */}
+          <div className="w-10% desktop">
+            <p className="pb-2 custom-font">Statistic Base</p>
             <div className="mt-8 overflow-y-auto table-container" style={{ maxHeight: '200px' }}>
               <table>
                 <thead>
@@ -400,6 +424,8 @@ export default function Home() {
             </div>
           </div>
         </div>
+        </div>
+        )}
         </div>
         )}
         {/* prophet */}
