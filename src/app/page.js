@@ -16,6 +16,7 @@ export default function Home() {
   const [chartRef2, setChartRef2] = useState(null);
   const [arimaSelected, setArimaSelected] = useState(true);
   const [prophetSelected, setProphetSelected] = useState(false);
+  const [selectedCrypto, setSelectedCrypto] = useState('BTC');
 
   const toggleBigDesktop = (selected) => {
     setArimaSelected(selected === 'arima');
@@ -26,7 +27,8 @@ export default function Home() {
     const fetchData = async () => {
       try {
         // Use a relative path instead of an absolute URL
-        const response = await axios.get("http://127.0.0.1:5000/");
+        // const response = await axios.get("http://127.0.0.1:5000/");
+        const response = (await axios.get(`http://127.0.0.1:5000/?instId=${selectedCrypto}-USDT`));
         
         setApiData1(JSON.parse(response.data.full_data_one));
         setPredictData1([JSON.parse(response.data.predict.forecast_one), response.data.predict.percentage_change_one]);
@@ -142,7 +144,12 @@ export default function Home() {
       }
     };
     fetchData();
-  }, []);
+  }, [selectedCrypto]);
+
+  const handleCryptoChange = (event) => {
+    setSelectedCrypto(event.target.value);
+    console.log(event.target.value)
+  };
 
   return (
     
@@ -163,10 +170,10 @@ export default function Home() {
           </label>
         <div style={{width: '20px'}}></div>
         <div>
-          <select className="form-select select-button custom-font" id="crypto-select" style={{fontSize: '20px'}}>
-            <option value="BTC">BTC</option>
-            <option value="SOL">SOL</option>
-          </select>
+          <select className="form-select select-button custom-font" id="crypto-select" style={{ fontSize: '20px' }} onChange={handleCryptoChange} value={selectedCrypto}>
+              <option value="BTC">BTC</option>
+              <option value="SOL">SOL</option>
+            </select>
         </div>
         <div className="flex justify-end items-center flex-grow">
           <a href="https://github.com/kennywang112">

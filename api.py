@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 from flask_cors import CORS
 
 from okx.api import Market as Market_api
@@ -17,14 +17,14 @@ columns = ['timestamp', 'open', 'high', 'low', 'close', 'volume', 'volCcy', 'vol
 date_string_after = ['2023-1-31','2023-2-28','2023-3-31','2023-4-30','2023-5-31','2023-6-30',
                      '2023-7-31','2023-8-31','2023-9-30','2023-10-31','2023-11-30','2023-12-31']
 
-market = Market_api(key='', secret='', passphrase='', flag='0')
+market = Market_api(key = '', secret = '', passphrase = '', flag = '0')
 okxSPOT = OkxSPOT(
-    key="",
-    secret="",
-    passphrase="",
+    key = "",
+    secret = "",
+    passphrase = "",
 )
 
-def History_finder(y, m, inter, full_data):
+def History_finder(y, m, inter, full_data, instId):
 
     # Declare full_data as a global variable
     month = f"{y}-{m}-1"
@@ -36,7 +36,7 @@ def History_finder(y, m, inter, full_data):
         time_after = datetime.strptime('2024-1-31', "%Y-%m-%d").timestamp()
         
     result = market.get_history_candles(
-        instId = 'BTC-USDT',
+        instId = instId,
         before = str(round(time_before * 1000)),
         after = str(round(time_after * 1000)),
         bar = inter
@@ -45,9 +45,9 @@ def History_finder(y, m, inter, full_data):
     data = pd.DataFrame(result['data'], columns = columns)
     data['date'] = pd.to_datetime(data['timestamp'], unit = 'ms')
     print(data)
-    data.sort_values(by='date', inplace=True)
+    data.sort_values(by = 'date', inplace = True)
     data[['open', 'high', 'low', 'close']] = data[['open', 'high', 'low', 'close']].apply(pd.to_numeric)
-    data.drop(['volume', 'timestamp', 'confirm', 'volCcyQuote', 'volCcy'], axis=1, inplace=True)
+    data.drop(['volume', 'timestamp', 'confirm', 'volCcyQuote', 'volCcy'], axis = 1, inplace = True)
 
     full_data = pd.concat([full_data, data])
     full_data['date'] = pd.to_datetime(full_data['date'])
@@ -113,22 +113,22 @@ CORS(app)
 
 @app.route('/')
 def home():
-
+    instId = request.args.get('instId', 'BTC-USDT') 
     full_data_one = pd.DataFrame(columns = ['open', 'high', 'low', 'close'])
     full_data_three = pd.DataFrame(columns = ['open', 'high', 'low', 'close'])
     # 1 day
     for m in range(11, 13):
-        full_data_one = History_finder(2023, m, '1D', full_data_one)
+        full_data_one = History_finder(2023, m, '1D', full_data_one, instId)
 
-    full_data_one = History_finder(2024, 1, '1D', full_data_one)
+    full_data_one = History_finder(2024, 1, '1D', full_data_one, instId)
 
     best_pdq_AIC_one, best_pdq_MSE_one = arima_AIC(full_data_one['open'], 4, 4, 4)
     forecast_one, percentage_change_one = predict(full_data_one, best_pdq_MSE_one)
     # 3 day
     for m in range(8, 13):
-        full_data_three = History_finder(2023, m, '3D', full_data_three)
+        full_data_three = History_finder(2023, m, '3D', full_data_three, instId)
 
-    full_data_three = History_finder(2024, 1, '3D', full_data_three)
+    full_data_three = History_finder(2024, 1, '3D', full_data_three, instId)
 
     best_pdq_AIC_three, best_pdq_MSE_three = arima_AIC(full_data_three['open'], 4, 4, 4)
     forecast_three, percentage_change_three = predict(full_data_three, best_pdq_MSE_three)
