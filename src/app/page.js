@@ -17,6 +17,8 @@ export default function Home() {
   const [day1selected, selectday1] = useState(true);
   const [day3selected, selectday3] = useState(false);
   const [selectedCrypto, setSelectedCrypto] = useState('BTC');
+  const [chart1, setChart1] = useState(null);
+  const [chart2, setChart2] = useState(null);
 
   const toggleBigDesktop = (selected) => {
     setArimaSelected(selected === 'arima');
@@ -61,78 +63,88 @@ export default function Home() {
         }
         const combinedArray1 = [...prices_one, ...JSON.parse(response.data.predict.forecast_one)];
         const combinedArray3 = [...prices_three, ...JSON.parse(response.data.predict.forecast_three)];
+
         const ctx1 = document.getElementById('stockChart');
         const ctx2 = document.getElementById('stockChart2');
 
         Chart.defaults.color = "rgb(39, 54, 43)";
-        newchartRef1 = new Chart(ctx1.getContext('2d'), {
-          type: 'line',
-          data: {
-            labels: [...dates_one, ...dates1_ten_days_later],
-            datasets: [{
-              label: 'origin',
-              borderColor: (context) => {
-                const lastIndex = context.dataset.data.length - 1;
-                return context.dataIndex > lastIndex - 10 ? 'rgb(75, 192, 192)' : 'rgb(39, 54, 43)';
-              },
-              data: combinedArray1,
-            }]
-          },
-          options: {
-            scales: {
-              x: [{
-                type: 'time',
-                time: {
-                  unit: 'day',
+        if (ctx1) {
+          newchartRef1 = new Chart(ctx1.getContext('2d'), {
+            type: 'line',
+            data: {
+              labels: [...dates_one, ...dates1_ten_days_later],
+              datasets: [{
+                label: 'origin',
+                borderColor: (context) => {
+                  const lastIndex = context.dataset.data.length - 1;
+                  return context.dataIndex > lastIndex - 10 ? 'rgb(75, 192, 192)' : 'rgb(39, 54, 43)';
                 },
-                scaleLabel: {
-                  display: true,
-                  text: 'date',
-                },
-              }],
-              y: {
-                scaleLabel: {
-                  display: true,
-                  text: 'price',
-                },
-              },
+                data: combinedArray1,
+              }]
             },
-          },
-        });
-        newchartRef2 = new Chart(ctx2.getContext('2d'), {
-          type: 'line',
-          data: {
-            labels: [...dates_three, ...dates3_ten_days_later],
-            datasets: [{
-              label: 'originprice',
-              borderColor: (context) => {
-                const lastIndex = context.dataset.data.length - 1;
-                return context.dataIndex > lastIndex - 10 ? 'rgb(75, 192, 192)' : 'rgb(39, 54, 43)';
-              },
-              data: combinedArray3,
-            }],
-          },
-          options: {
-            scales: {
-              x: [{
-                type: 'time',
-                time: {
-                  unit: 'day',
-                },
-                scaleLabel: {
-                  display: true,
-                  text: 'date',
-                },
+            options: {
+              scales: {
+                x: [{
+                  type: 'time',
+                  time: {
+                    unit: 'day',
+                  },
+                  scaleLabel: {
+                    display: true,
+                    text: 'date',
+                  },
                 }],
-              y: {
-                scaleLabel: {
-                  display: true,
-                  text: 'price',
+                y: {
+                  scaleLabel: {
+                    display: true,
+                    text: 'price',
+                  },
                 },
               },
             },
-          },
-        });
+          });
+        } else if (ctx2) {
+          newchartRef2 = new Chart(ctx2.getContext('2d'), {
+            type: 'line',
+            data: {
+              labels: [...dates_three, ...dates3_ten_days_later],
+              datasets: [{
+                label: 'originprice',
+                borderColor: (context) => {
+                  const lastIndex = context.dataset.data.length - 1;
+                  return context.dataIndex > lastIndex - 10 ? 'rgb(75, 192, 192)' : 'rgb(39, 54, 43)';
+                },
+                data: combinedArray3,
+              }],
+            },
+            options: {
+              scales: {
+                x: [{
+                  type: 'time',
+                  time: {
+                    unit: 'day',
+                  },
+                  scaleLabel: {
+                    display: true,
+                    text: 'date',
+                  },
+                  }],
+                y: {
+                  scaleLabel: {
+                    display: true,
+                    text: 'price',
+                  },
+                },
+              },
+            },
+          });
+        };
+
+        setChart1(newchartRef1);
+        setChart2(newchartRef2);
+
+        console.log(chart1)
+        console.log(chart2)
 
         console.log('finish')
       } catch (error) {
@@ -140,7 +152,7 @@ export default function Home() {
       }
     };
     fetchData();
-  }, [selectedCrypto]);
+  }, [selectedCrypto, chart1, chart2]);
 
   return (
     <main className="flex flex-col items-center p-4 h-screen">
@@ -308,7 +320,8 @@ export default function Home() {
                 </table>
               </div>
             </div>
-          </div></div>
+          </div>
+          </div>
           )}
           {day3selected && (
           <div>
@@ -388,7 +401,8 @@ export default function Home() {
                 </table>
               </div>
             </div>
-          </div></div>
+          </div>
+          </div>
           )}
         </div>
         )}
