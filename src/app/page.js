@@ -8,9 +8,11 @@ import Chart from 'chart.js/auto';
 export default function Home() {
 
   const [apiData1, setApiData1] = useState(null);
-  const [predictData1, setPredictData1] = useState(null);
   const [apiData2, setApiData2] = useState(null);
+  const [predictData1, setPredictData1] = useState(null);
   const [predictData2, setPredictData2] = useState(null);
+  const [prophetData1, setProphetData1] = useState(null);
+  const [prophetData2, setProphetData2] = useState(null);
   const [errorData, setErrorData] = useState(null);
   const [arimaSelected, setArimaSelected] = useState(true);
   const [prophetSelected, setProphetSelected] = useState(false);
@@ -40,12 +42,16 @@ export default function Home() {
         let newchartRef1, newchartRef2;
         const response = (await axios.get(`http://127.0.0.1:5000/?instId=${selectedCrypto}-USDT`));
         setApiData1(JSON.parse(response.data.full_data_one));
-        setPredictData1([JSON.parse(response.data.predict.forecast_one), response.data.predict.percentage_change_one]);
+        setPredictData1([JSON.parse(response.data.arima_predict.forecast_one), response.data.arima_predict.percentage_change_one]);
         const stockData_one = await JSON.parse(response.data.full_data_one);
         setApiData2(JSON.parse(response.data.full_data_three));
-        setPredictData2([JSON.parse(response.data.predict.forecast_three), response.data.predict.percentage_change_three]);
+        setPredictData2([JSON.parse(response.data.arima_predict.forecast_three), response.data.arima_predict.percentage_change_three]);
         const stockData_three = await JSON.parse(response.data.full_data_three);
         setErrorData(response.data.error);
+        setProphetData1(JSON.parse(response.data.prophet_predict.forecast_one));
+        setProphetData2(JSON.parse(response.data.prophet_predict.forecast_three));
+        
+        console.log('prophet data:',prophetData1)
         // get dates and prices
         const dates_one = await stockData_one.map(entry => new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }));
         const prices_one = await stockData_one.map(entry => entry.close);
@@ -61,8 +67,8 @@ export default function Home() {
           dates1_ten_days_later.push(newDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }));
           dates3_ten_days_later.push(newDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }));
         }
-        const combinedArray1 = [...prices_one, ...JSON.parse(response.data.predict.forecast_one)];
-        const combinedArray3 = [...prices_three, ...JSON.parse(response.data.predict.forecast_three)];
+        const combinedArray1 = [...prices_one, ...JSON.parse(response.data.arima_predict.forecast_one)];
+        const combinedArray3 = [...prices_three, ...JSON.parse(response.data.arima_predict.forecast_three)];
 
         const ctx1 = document.getElementById('stockChart');
         const ctx2 = document.getElementById('stockChart2');
@@ -418,169 +424,171 @@ export default function Home() {
               Day 3
             </button>
           </div>
-          <div className="my-8"></div>
-          {/* history and statistics */}
-          {day1selected && (
-          <div>
-          <canvas id="stockChart" width="750" height="400"></canvas>
-          <div className="flex justify-between w-full">
-            {/* history */}
-            <div className="w-10% desktop">
-              {apiData1 && apiData1.length > 0 ? (
-              <div className = "mt-8 overflow-y-auto table-container" style = {{ maxHeight: '250px' }}>
-                <table>
-                  <thead>
-                    <tr className = "custom-font">
-                      <th>Index</th>
-                      <th>Open</th>
-                      <th>High</th>
-                      <th>Low</th>
-                      <th>Close</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {apiData1.map((item, index) => (
-                      <tr key={index}>
-                        <td className="with-border">{index}</td>
-                        <td className="with-border">{item.open}</td>
-                        <td className="with-border">{item.high}</td>
-                        <td className="with-border">{item.low}</td>
-                        <td>{item.close}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              ) : (
-                <p>stock history</p>
-              )}
-            </div>
-            {/* predict */}
-            <div className="w-10% desktop">
-              <div className="mt-8 overflow-y-auto table-container" style={{ maxHeight: '250px' }}>
-                <table>
-                  <thead>
-                    <tr className = "custom-font">
-                      <th>Day</th>
-                      <th>Price</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                  {predictData1 && predictData1[0].map((data, index) => (
+        <div className="my-8"></div>
+        {/* history and statistics */}
+        {day1selected && (
+        <div>
+        <canvas id="stockChart" width="750" height="400"></canvas>
+        <div className="flex justify-between w-full">
+          {/* history */}
+          <div className="w-10% desktop">
+            {apiData1 && apiData1.length > 0 ? (
+            <div className = "mt-8 overflow-y-auto table-container" style = {{ maxHeight: '250px' }}>
+              <table>
+                <thead>
+                  <tr className = "custom-font">
+                    <th>Index</th>
+                    <th>Open</th>
+                    <th>High</th>
+                    <th>Low</th>
+                    <th>Close</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {apiData1.map((item, index) => (
                     <tr key={index}>
-                      <td className = "with-border">{index}</td>
-                      <td>{data.toFixed(3)}</td>
+                      <td className="with-border">{index}</td>
+                      <td className="with-border">{item.open}</td>
+                      <td className="with-border">{item.high}</td>
+                      <td className="with-border">{item.low}</td>
+                      <td>{item.close}</td>
                     </tr>
                   ))}
                 </tbody>
-                </table>
-              </div>
+              </table>
             </div>
-            {/* statistics */}
-            <div className="w-10% desktop">
-              <p className="pb-2 custom-font">Statistic Base</p>
-              <div className="mt-8 overflow-y-auto table-container" style={{ maxHeight: '200px' }}>
-                <table>
-                  <tbody>
-                    <tr>
-                      <td>Best pdq AIC : </td>
-                      <td>[{errorData ? errorData.best_pdq_AIC_one : null}]</td>
-                    </tr>
-                    <tr>
-                      <td>Best pdq BIC : </td>
-                      <td>[{errorData ? errorData.best_pdq_MSE_one : null}]</td>
-                    </tr>
-                    <tr>
-                      <td>Percent ten days : </td>
-                      <td>{predictData1 ? predictData1[1].toFixed(2) : null} %</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+            ) : (
+              <p>stock history</p>
+            )}
+          </div>
+          {/* predict */}
+          <div className="w-10% desktop">
+            <div className="mt-8 overflow-y-auto table-container" style={{ maxHeight: '250px' }}>
+              <table>
+                <thead>
+                  <tr className = "custom-font">
+                    <th>Day</th>
+                    <th>Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                {predictData1 && predictData1[0].map((data, index) => (
+                  <tr key={index}>
+                    <td className = "with-border">{index}</td>
+                    <td>{data.toFixed(3)}</td>
+                  </tr>
+                ))}
+              </tbody>
+              </table>
             </div>
-          </div></div>
-          )}
-          {day3selected && (
-          <div>
-          <canvas id="stockChart2" width="750" height="400"></canvas>
-          <div className="flex justify-between w-full">
-            {/* history */}
-            <div className="w-10% desktop">
-              {apiData2 && apiData2.length > 0 ? (
-              <div className = "mt-8 overflow-y-auto table-container" style = {{ maxHeight: '250px' }}>
-                <table>
-                  <thead>
-                    <tr className = "custom-font">
-                      <th>Index</th>
-                      <th>Open</th>
-                      <th>High</th>
-                      <th>Low</th>
-                      <th>Close</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {apiData2.map((item, index) => (
-                      <tr key={index}>
-                        <td className="with-border">{index}</td>
-                        <td className="with-border">{item.open}</td>
-                        <td className="with-border">{item.high}</td>
-                        <td className="with-border">{item.low}</td>
-                        <td>{item.close}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              ) : (
-                <p>stock history</p>
-              )}
-            </div>
-            {/* predict */}
-            <div className="w-10% desktop">
-              <div className="mt-8 overflow-y-auto table-container" style={{ maxHeight: '250px' }}>
-                <table>
-                  <thead>
-                    <tr className = "custom-font">
-                      <th>Day</th>
-                      <th>Price</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                  {predictData1 && predictData1[0].map((data, index) => (
-                    <tr key={index}>
-                      <td className = "with-border">{index}</td>
-                      <td>{data.toFixed(3)}</td>
-                    </tr>
-                  ))}
+          </div>
+          {/* statistics */}
+          <div className="w-10% desktop">
+            <p className="pb-2 custom-font">Statistic Base</p>
+            <div className="mt-8 overflow-y-auto table-container" style={{ maxHeight: '200px' }}>
+              <table>
+                <tbody>
+                  <tr>
+                    <td>Best pdq AIC : </td>
+                    <td>[{errorData ? errorData.best_pdq_AIC_one : null}]</td>
+                  </tr>
+                  <tr>
+                    <td>Best pdq BIC : </td>
+                    <td>[{errorData ? errorData.best_pdq_MSE_one : null}]</td>
+                  </tr>
+                  <tr>
+                    <td>Percent ten days : </td>
+                    <td>{predictData1 ? predictData1[1].toFixed(2) : null} %</td>
+                  </tr>
                 </tbody>
-                </table>
-              </div>
+              </table>
             </div>
-            {/* statistics */}
-            <div className="w-10% desktop">
-              <p className="pb-2 custom-font">Statistic Base</p>
-              <div className="mt-8 overflow-y-auto table-container" style={{ maxHeight: '200px' }}>
-                <table>
-                  <tbody>
-                    <tr>
-                      <td>Best pdq AIC : </td>
-                      <td>[{errorData ? errorData.best_pdq_AIC_three : null}]</td>
-                    </tr>
-                    <tr>
-                      <td>Best pdq BIC : </td>
-                      <td>[{errorData ? errorData.best_pdq_MSE_three : null}]</td>
-                    </tr>
-                    <tr>
-                      <td>Percent ten days : </td>
-                      <td>{predictData2 ? predictData2[1].toFixed(2) : null} %</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div></div>
-          )}
+          </div>
         </div>
+        </div>
+        )}
+        {day3selected && (
+        <div>
+        <canvas id="stockChart2" width="750" height="400"></canvas>
+        <div className="flex justify-between w-full">
+          {/* history */}
+          <div className="w-10% desktop">
+            {apiData2 && apiData2.length > 0 ? (
+            <div className = "mt-8 overflow-y-auto table-container" style = {{ maxHeight: '250px' }}>
+              <table>
+                <thead>
+                  <tr className = "custom-font">
+                    <th>Index</th>
+                    <th>Open</th>
+                    <th>High</th>
+                    <th>Low</th>
+                    <th>Close</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {apiData2.map((item, index) => (
+                    <tr key={index}>
+                      <td className="with-border">{index}</td>
+                      <td className="with-border">{item.open}</td>
+                      <td className="with-border">{item.high}</td>
+                      <td className="with-border">{item.low}</td>
+                      <td>{item.close}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            ) : (
+              <p>stock history</p>
+            )}
+          </div>
+          {/* predict */}
+          <div className="w-10% desktop">
+            <div className="mt-8 overflow-y-auto table-container" style={{ maxHeight: '250px' }}>
+              <table>
+                <thead>
+                  <tr className = "custom-font">
+                    <th>Day</th>
+                    <th>Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                {predictData1 && predictData1[0].map((data, index) => (
+                  <tr key={index}>
+                    <td className = "with-border">{index}</td>
+                    <td>{data.toFixed(3)}</td>
+                  </tr>
+                ))}
+              </tbody>
+              </table>
+            </div>
+          </div>
+          {/* statistics */}
+          <div className="w-10% desktop">
+            <p className="pb-2 custom-font">Statistic Base</p>
+            <div className="mt-8 overflow-y-auto table-container" style={{ maxHeight: '200px' }}>
+              <table>
+                <tbody>
+                  <tr>
+                    <td>Best pdq AIC : </td>
+                    <td>[{errorData ? errorData.best_pdq_AIC_three : null}]</td>
+                  </tr>
+                  <tr>
+                    <td>Best pdq BIC : </td>
+                    <td>[{errorData ? errorData.best_pdq_MSE_three : null}]</td>
+                  </tr>
+                  <tr>
+                    <td>Percent ten days : </td>
+                    <td>{predictData2 ? predictData2[1].toFixed(2) : null} %</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        </div>
+        )}
+      </div>
         )}
       </section>
     </main>

@@ -6,6 +6,7 @@ from okx.app import OkxSPOT
 
 import pandas as pd
 import time
+from prophet import Prophet
 import statsmodels.api as sm
 from datetime import datetime
 from sklearn.metrics import mean_absolute_error, mean_squared_error
@@ -94,7 +95,7 @@ def arima_AIC(data, p = 4, d = 4, q = 4):
     
     return best_pdq[0], best_pdq[2]
 
-def predict(full_data, best_pdq_MSE):
+def arima_predict(full_data, best_pdq_MSE):
 
     model = sm.tsa.ARIMA(full_data['open'], order = best_pdq_MSE)
     fitted = model.fit()
@@ -107,6 +108,19 @@ def predict(full_data, best_pdq_MSE):
     percentage_change = ((ten_days_after - one_days_after) / one_days_after) * 100
 
     return forecast, percentage_change
+
+def prophet_predict(full_data):
+    
+    new_full_data = full_data.set_index('date', inplace = False)
+    df = pd.DataFrame(new_full_data['open'])
+    df.reset_index(inplace = True)
+    df = df.rename(columns = {'date': 'ds', 'open': 'y'})
+    model = Prophet()
+    model.fit(df)
+    future = model.make_future_dataframe(periods=10)
+    forecast = model.predict(future)
+
+    return forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']]
 
 app = Flask(__name__)
 CORS(app)
@@ -123,7 +137,7 @@ def home():
     full_data_one = History_finder(2024, 1, '1D', full_data_one, instId)
 
     best_pdq_AIC_one, best_pdq_MSE_one = arima_AIC(full_data_one['open'], 4, 4, 4)
-    forecast_one, percentage_change_one = predict(full_data_one, best_pdq_MSE_one)
+    arima_forecast_one, percentage_change_one = arima_predict(full_data_one, best_pdq_MSE_one)
     # 3 day
     for m in range(8, 13):
         full_data_three = History_finder(2023, m, '3D', full_data_three, instId)
@@ -131,7 +145,9 @@ def home():
     full_data_three = History_finder(2024, 1, '3D', full_data_three, instId)
 
     best_pdq_AIC_three, best_pdq_MSE_three = arima_AIC(full_data_three['open'], 4, 4, 4)
-    forecast_three, percentage_change_three = predict(full_data_three, best_pdq_MSE_three)
+    arima_forecast_three, percentage_change_three = arima_predict(full_data_three, best_pdq_MSE_three)
+    prophet_forecast_one = prophet_predict(full_data_one)
+    prophet_forecast_three = prophet_predict(full_data_three)
 
     # 整合成 JSON 物件
     result = {
@@ -143,11 +159,15 @@ def home():
             "best_pdq_AIC_three": best_pdq_AIC_three,
             "best_pdq_MSE_three": best_pdq_MSE_three
         },
-        "predict": {
-            "forecast_one": forecast_one.to_json(orient = 'records'),
-            "forecast_three": forecast_three.to_json(orient = 'records'),
+        "arima_predict": {
+            "forecast_one": arima_forecast_one.to_json(orient = 'records'),
+            "forecast_three": arima_forecast_three.to_json(orient = 'records'),
             "percentage_change_one": percentage_change_one,
             "percentage_change_three": percentage_change_three,
+        },
+        "prophet_predict": {
+            "forecast_one": prophet_forecast_one.to_json(orient = 'records'),
+            "forecast_three": prophet_forecast_three.to_json(orient = 'records'),
         }
     }
 
