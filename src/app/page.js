@@ -23,6 +23,7 @@ export default function Home() {
   const [chart2, setChart2] = useState(null);
   const [chart3, setChart3] = useState(null);
   const [chart4, setChart4] = useState(null);
+  const [isDataFetched, setIsDataFetched] = useState(false);
 
   const toggleBigDesktop = (selected) => {
     setArimaSelected(selected === 'arima');
@@ -30,7 +31,7 @@ export default function Home() {
     console.log(selected)
   };
   const handleCryptoChange = (event) => {
-    setSelectedCrypto(event.target.value);
+    setSelectedCrypto(event);
     console.log(event)
   };
   const dayChange = (selected) => {
@@ -38,200 +39,222 @@ export default function Home() {
     selectday3(selected === 'day3');
     console.log(selected)
   };
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        let newchartRef1, newchartRef2, newchartRef3, newchartRef4;
-        const response = (await axios.get(`http://127.0.0.1:5000/?instId=${selectedCrypto}-USDT`));
-        const stockData_one = await JSON.parse(response.data.full_data_one);
-        const stockData_three = await JSON.parse(response.data.full_data_three);
 
-        setApiData1(JSON.parse(response.data.full_data_one));
-        setApiData2(JSON.parse(response.data.full_data_three));
-        setPredictData1([JSON.parse(response.data.arima_predict.forecast_one), response.data.arima_predict.percentage_change_one]);
-        setPredictData2([JSON.parse(response.data.arima_predict.forecast_three), response.data.arima_predict.percentage_change_three]);
-        setProphetData1(JSON.parse(response.data.prophet_predict.forecast_one));
-        setProphetData2(JSON.parse(response.data.prophet_predict.forecast_three));
-        setErrorData(response.data.error);
-        // get dates and prices
-        const dates_one = await stockData_one.map(entry => new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }));
-        const prices_one = await stockData_one.map(entry => entry.close);
-        const dates_three = await stockData_three.map(entry => new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }));
-        const prices_three = await stockData_three.map(entry => entry.close);
-        // adding date
-        let dates1_ten_days_later = [];
-        let dates3_ten_days_later = [];
-        let lastDateStr = dates_one[dates_one.length - 1];
-        let newDate = new Date(lastDateStr);
-        for (let i = 1; i <= 10; i++) {
-          newDate.setDate(newDate.getDate() + i);
-          dates1_ten_days_later.push(newDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }));
-          dates3_ten_days_later.push(newDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }));
-        }
-        // combine price
-        const combinedArray1 = [...prices_one, ...JSON.parse(response.data.arima_predict.forecast_one)];
-        const combinedArray3 = [...prices_three, ...JSON.parse(response.data.arima_predict.forecast_three)];
-        const combinedArrayProphet1 = [...prices_one, ...JSON.parse(response.data.prophet_predict.forecast_one).slice(-10).map(entry => entry.yhat)];
-        const combinedArrayProphet3 = [...prices_three, ...JSON.parse(response.data.prophet_predict.forecast_three).slice(-10).map(entry => entry.yhat)];
-        const ctx1 = document.getElementById('stockChart');
-        const ctx2 = document.getElementById('stockChart2');
-        const ctx3 = document.getElementById('stockChart3');
-        const ctx4 = document.getElementById('stockChart4');
-        // chart
-        Chart.defaults.color = "rgb(39, 54, 43)";
-        if (ctx1) {
-          newchartRef1 = new Chart(ctx1.getContext('2d'), {
-            type: 'line',
-            data: {
-              labels: [...dates_one, ...dates1_ten_days_later],
-              datasets: [{
-                label: 'origin',
-                borderColor: (context) => {
-                  const lastIndex = context.dataset.data.length - 1;
-                  return context.dataIndex > lastIndex - 10 ? 'rgb(75, 192, 192)' : 'rgb(39, 54, 43)';
-                },
-                data: combinedArray1,
-              }]
-            },
-            options: {
-              scales: {
-                x: [{
-                  type: 'time',
-                  time: {
-                    unit: 'day',
-                  },
-                  scaleLabel: {
-                    display: true,
-                    text: 'date',
-                  },
-                }],
-                y: {
-                  scaleLabel: {
-                    display: true,
-                    text: 'price',
-                  },
-                },
-              },
-            },
-          });
-        } else if (ctx2) {
-          newchartRef2 = new Chart(ctx2.getContext('2d'), {
-            type: 'line',
-            data: {
-              labels: [...dates_three, ...dates3_ten_days_later],
-              datasets: [{
-                label: 'originprice',
-                borderColor: (context) => {
-                  const lastIndex = context.dataset.data.length - 1;
-                  return context.dataIndex > lastIndex - 10 ? 'rgb(75, 192, 192)' : 'rgb(39, 54, 43)';
-                },
-                data: combinedArray3,
-              }],
-            },
-            options: {
-              scales: {
-                x: [{
-                  type: 'time',
-                  time: {
-                    unit: 'day',
-                  },
-                  scaleLabel: {
-                    display: true,
-                    text: 'date',
-                  },
-                  }],
-                y: {
-                  scaleLabel: {
-                    display: true,
-                    text: 'price',
-                  },
-                },
-              },
-            },
-          });
-        } else if (ctx3) {
-          newchartRef3 = new Chart(ctx3.getContext('2d'), {
-            type: 'line',
-            data: {
-              labels: [...dates_one, ...dates1_ten_days_later],
-              datasets: [{
-                label: 'origin',
-                borderColor: (context) => {
-                  const lastIndex = context.dataset.data.length - 1;
-                  return context.dataIndex > lastIndex - 10 ? 'rgb(75, 192, 192)' : 'rgb(39, 54, 43)';
-                },
-                data: combinedArrayProphet1,
-              }]
-            },
-            options: {
-              scales: {
-                x: [{
-                  type: 'time',
-                  time: {
-                    unit: 'day',
-                  },
-                  scaleLabel: {
-                    display: true,
-                    text: 'date',
-                  },
-                }],
-                y: {
-                  scaleLabel: {
-                    display: true,
-                    text: 'price',
-                  },
-                },
-              },
-            },
-          });
-        } else if (ctx4) {
-          newchartRef4 = new Chart(ctx4.getContext('2d'), {
-            type: 'line',
-            data: {
-              labels: [...dates_three, ...dates3_ten_days_later],
-              datasets: [{
-                label: 'origin',
-                borderColor: (context) => {
-                  const lastIndex = context.dataset.data.length - 1;
-                  return context.dataIndex > lastIndex - 10 ? 'rgb(75, 192, 192)' : 'rgb(39, 54, 43)';
-                },
-                data: combinedArrayProphet3,
-              }]
-            },
-            options: {
-              scales: {
-                x: [{
-                  type: 'time',
-                  time: {
-                    unit: 'day',
-                  },
-                  scaleLabel: {
-                    display: true,
-                    text: 'date',
-                  },
-                }],
-                y: {
-                  scaleLabel: {
-                    display: true,
-                    text: 'price',
-                  },
-                },
-              },
-            },
-          });
-        };
-        setChart1(newchartRef1);
-        setChart2(newchartRef2);
-        setChart3(newchartRef3);
-        setChart4(newchartRef4);
-        console.log('finish')
-        console.log(JSON.parse(response.data.prophet_predict.forecast_one))
+  useEffect(() => {
+    const fetchApi = async () => {
+      try {
+        const response = (await axios.get(`http://127.0.0.1:5000/?instId=${selectedCrypto}-USDT`));
+        setIsDataFetched(true);
+        return response;
       } catch (error) {
         console.error('Error fetching data:', error);
+      };
+    };
+    const fetchData = async (response) => {
+      try {
+        console.log('processing:',response)
+        if (response?.data) {
+          let newchartRef1, newchartRef2, newchartRef3, newchartRef4;
+          const stockData_one = await JSON.parse(response.data.full_data_one);
+          const stockData_three = await JSON.parse(response.data.full_data_three);
+
+          setApiData1(JSON.parse(response.data.full_data_one));
+          setApiData2(JSON.parse(response.data.full_data_three));
+          setPredictData1([JSON.parse(response.data.arima_predict.forecast_one), response.data.arima_predict.percentage_change_one]);
+          setPredictData2([JSON.parse(response.data.arima_predict.forecast_three), response.data.arima_predict.percentage_change_three]);
+          setProphetData1(JSON.parse(response.data.prophet_predict.forecast_one));
+          setProphetData2(JSON.parse(response.data.prophet_predict.forecast_three));
+          setErrorData(response.data.error);
+          // get dates and prices
+          const dates_one = await stockData_one.map(entry => new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }));
+          const prices_one = await stockData_one.map(entry => entry.close);
+          const dates_three = await stockData_three.map(entry => new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }));
+          const prices_three = await stockData_three.map(entry => entry.close);
+          // adding date
+          let dates1_ten_days_later = [];
+          let dates3_ten_days_later = [];
+          let lastDateStr = dates_one[dates_one.length - 1];
+          let newDate = new Date(lastDateStr);
+          for (let i = 1; i <= 10; i++) {
+            newDate.setDate(newDate.getDate() + i);
+            dates1_ten_days_later.push(newDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }));
+            dates3_ten_days_later.push(newDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }));
+          }
+          // combine price
+          const combinedArray1 = [...prices_one, ...JSON.parse(response.data.arima_predict.forecast_one)];
+          const combinedArray3 = [...prices_three, ...JSON.parse(response.data.arima_predict.forecast_three)];
+          const combinedArrayProphet1 = [...prices_one, ...JSON.parse(response.data.prophet_predict.forecast_one).slice(-10).map(entry => entry.yhat)];
+          const combinedArrayProphet3 = [...prices_three, ...JSON.parse(response.data.prophet_predict.forecast_three).slice(-10).map(entry => entry.yhat)];
+          const ctx1 = document.getElementById('stockChart');
+          const ctx2 = document.getElementById('stockChart2');
+          const ctx3 = document.getElementById('stockChart3');
+          const ctx4 = document.getElementById('stockChart4');
+          // chart
+          Chart.defaults.color = "rgb(39, 54, 43)";
+          if (ctx1) {
+            newchartRef1 = new Chart(ctx1.getContext('2d'), {
+              type: 'line',
+              data: {
+                labels: [...dates_one, ...dates1_ten_days_later],
+                datasets: [{
+                  label: 'origin',
+                  borderColor: (context) => {
+                    const lastIndex = context.dataset.data.length - 1;
+                    return context.dataIndex > lastIndex - 10 ? 'rgb(75, 192, 192)' : 'rgb(39, 54, 43)';
+                  },
+                  data: combinedArray1,
+                }]
+              },
+              options: {
+                scales: {
+                  x: [{
+                    type: 'time',
+                    time: {
+                      unit: 'day',
+                    },
+                    scaleLabel: {
+                      display: true,
+                      text: 'date',
+                    },
+                  }],
+                  y: {
+                    scaleLabel: {
+                      display: true,
+                      text: 'price',
+                    },
+                  },
+                },
+              },
+            });
+          } else if (ctx2) {
+            newchartRef2 = new Chart(ctx2.getContext('2d'), {
+              type: 'line',
+              data: {
+                labels: [...dates_three, ...dates3_ten_days_later],
+                datasets: [{
+                  label: 'originprice',
+                  borderColor: (context) => {
+                    const lastIndex = context.dataset.data.length - 1;
+                    return context.dataIndex > lastIndex - 10 ? 'rgb(75, 192, 192)' : 'rgb(39, 54, 43)';
+                  },
+                  data: combinedArray3,
+                }],
+              },
+              options: {
+                scales: {
+                  x: [{
+                    type: 'time',
+                    time: {
+                      unit: 'day',
+                    },
+                    scaleLabel: {
+                      display: true,
+                      text: 'date',
+                    },
+                    }],
+                  y: {
+                    scaleLabel: {
+                      display: true,
+                      text: 'price',
+                    },
+                  },
+                },
+              },
+            });
+          } else if (ctx3) {
+            newchartRef3 = new Chart(ctx3.getContext('2d'), {
+              type: 'line',
+              data: {
+                labels: [...dates_one, ...dates1_ten_days_later],
+                datasets: [{
+                  label: 'origin',
+                  borderColor: (context) => {
+                    const lastIndex = context.dataset.data.length - 1;
+                    return context.dataIndex > lastIndex - 10 ? 'rgb(75, 192, 192)' : 'rgb(39, 54, 43)';
+                  },
+                  data: combinedArrayProphet1,
+                }]
+              },
+              options: {
+                scales: {
+                  x: [{
+                    type: 'time',
+                    time: {
+                      unit: 'day',
+                    },
+                    scaleLabel: {
+                      display: true,
+                      text: 'date',
+                    },
+                  }],
+                  y: {
+                    scaleLabel: {
+                      display: true,
+                      text: 'price',
+                    },
+                  },
+                },
+              },
+            });
+          } else if (ctx4) {
+            newchartRef4 = new Chart(ctx4.getContext('2d'), {
+              type: 'line',
+              data: {
+                labels: [...dates_three, ...dates3_ten_days_later],
+                datasets: [{
+                  label: 'origin',
+                  borderColor: (context) => {
+                    const lastIndex = context.dataset.data.length - 1;
+                    return context.dataIndex > lastIndex - 10 ? 'rgb(75, 192, 192)' : 'rgb(39, 54, 43)';
+                  },
+                  data: combinedArrayProphet3,
+                }]
+              },
+              options: {
+                scales: {
+                  x: [{
+                    type: 'time',
+                    time: {
+                      unit: 'day',
+                    },
+                    scaleLabel: {
+                      display: true,
+                      text: 'date',
+                    },
+                  }],
+                  y: {
+                    scaleLabel: {
+                      display: true,
+                      text: 'price',
+                    },
+                  },
+                },
+              },
+            });
+          };
+          setChart1(newchartRef1);
+          setChart2(newchartRef2);
+          setChart3(newchartRef3);
+          setChart4(newchartRef4);
+        } else {
+          throw new Error('havent get data');
+        }
+      } catch (error) {
+        console.error('Error fetching data');
       }
     };
-    fetchData();
-  }, [selectedCrypto, chart1, chart2, chart3, chart4]);
+    let responseData;
+    if (!isDataFetched) {
+      fetchApi().then((response) => {
+        responseData = response;
+        fetchData(response);
+      });
+    } else {
+      if (responseData) {
+        fetchData(responseData);
+      }
+    }
+  }, [chart1, chart2, chart3, chart4, toggleBigDesktop, handleCryptoChange, dayChange]);
 
   return (
     <main className="flex flex-col items-center p-4 h-screen">
