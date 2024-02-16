@@ -250,9 +250,10 @@ export default function Home() {
         fetchData(response);
       });
     } else {
-      if (responseData) {
+      // if (responseData) {
+        console.log('event');
         fetchData(responseData);
-      }
+      // }
     }
   }, [chart1, chart2, chart3, chart4, toggleBigDesktop, handleCryptoChange, dayChange]);
 
