@@ -16,7 +16,7 @@
   }
 }
 
-body {
+/* body {
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(
       to bottom,
@@ -24,6 +24,11 @@ body {
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
+} */
+body {
+  color: rgb(var(--foreground-rgb));
+  background-image: url('../../public/background.jpg');
+  background-size: cover; /* 調整背景圖片大小以填滿整個視窗 */
 }
 
 @layer utilities {
@@ -34,7 +39,7 @@ body {
 
 .desktop {
   padding: 45px 20px 30px 20px;
-  background: hsla(164, 25%, 44%, 0.471);
+  background: hsla(103, 18%, 50%, 0.9);
   border-radius: 20px;
   border: 1px solid rgb(173, 104, 104);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
@@ -42,7 +47,7 @@ body {
 
 .bigdesktop {
   padding: 20px 90px 30px 90px;
-  background: hsla(28, 34%, 50%, 0.471);
+  background: hsla(79, 21%, 59%, 0.9);
   border-radius: 20px;
   border: 1px solid rgb(173, 104, 104);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);

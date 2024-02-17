@@ -67,8 +67,8 @@ export default function Home() {
         setApiData2(JSON.parse(fullData.full_data_three));
         setPredictData1([JSON.parse(fullData.arima_predict.forecast_one), fullData.arima_predict.percentage_change_one]);
         setPredictData2([JSON.parse(fullData.arima_predict.forecast_three), fullData.arima_predict.percentage_change_three]);
-        setProphetData1(JSON.parse(fullData.prophet_predict.forecast_one));
-        setProphetData2(JSON.parse(fullData.prophet_predict.forecast_three));
+        setProphetData1([JSON.parse(fullData.prophet_predict.forecast_one), fullData.prophet_predict.percentage_change_one]);
+        setProphetData2([JSON.parse(fullData.prophet_predict.forecast_three), fullData.prophet_predict.percentage_change_three]);
         setErrorData(fullData.error);
       }
       // get dates and prices
@@ -270,10 +270,11 @@ export default function Home() {
             width={30}
             height={24}
             priority
-          /></a>
-          <label htmlFor="selectOption" className="text-2xl font-semibold custom-font" style={{fontSize: '28px'}}>
-            StoneTrader
-          </label>
+          />
+        </a>
+        <label htmlFor="selectOption" className="text-2xl font-semibold custom-font" style={{fontSize: '28px', color: '#c49749'}}>
+          StoneTrader
+        </label>
         <div style={{width: '20px'}}></div>
         <div>
           <select className="form-select select-button custom-font" id="crypto-select" style={{ fontSize: '20px' }} onChange={handleCryptoChange} value={selectedCrypto}>
@@ -572,7 +573,7 @@ export default function Home() {
                   </tr>
                 </thead>
                 <tbody>
-                {prophetData1 && prophetData1.map((data, index) => (
+                {prophetData1 && prophetData1[0].slice(-10).map((data, index) => (
                   <tr key={index}>
                     <td className = "with-border">{index}</td>
                     <td>{data.yhat.toFixed(1)}</td>
@@ -587,20 +588,12 @@ export default function Home() {
           {/* statistics */}
           <div className="w-10% desktop">
             <p className="pb-2 custom-font">Statistic Base</p>
-            <div className="mt-8 overflow-y-auto table-container" style={{ maxHeight: '200px' }}>
+            <div className="mt-8 overflow-y-auto table-container" style = {{ maxHeight: '200px' }}>
               <table>
                 <tbody>
-                  <tr>
-                    <td>Best pdq AIC : </td>
-                    <td>[{errorData ? errorData.best_pdq_AIC_one : null}]</td>
-                  </tr>
-                  <tr>
-                    <td>Best pdq BIC : </td>
-                    <td>[{errorData ? errorData.best_pdq_MSE_one : null}]</td>
-                  </tr>
-                  <tr>
+                <tr>
                     <td>Percent ten days : </td>
-                    <td>{predictData1 ? predictData1[1].toFixed(2) : null} %</td>
+                    <td>{prophetData1 ? prophetData1[1].toFixed(2) : null} %</td>
                   </tr>
                 </tbody>
               </table>
@@ -646,7 +639,7 @@ export default function Home() {
           </div>
           {/* predict */}
           <div className="w-10% desktop">
-            <div className="mt-8 overflow-y-auto table-container" style={{ maxHeight: '250px' }}>
+            <div className="mt-8 overflow-y-auto table-container" style = {{ maxHeight: '250px' }}>
               <table>
                 <thead>
                   <tr className = "custom-font">
@@ -657,7 +650,7 @@ export default function Home() {
                   </tr>
                 </thead>
                 <tbody>
-                {prophetData2 && prophetData2.map((data, index) => (
+                {prophetData2 && prophetData2[0].slice(-10).map((data, index) => (
                   <tr key={index}>
                     <td className = "with-border">{index}</td>
                     <td>{data.yhat.toFixed(1)}</td>
@@ -672,20 +665,12 @@ export default function Home() {
           {/* statistics */}
           <div className="w-10% desktop">
             <p className="pb-2 custom-font">Statistic Base</p>
-            <div className="mt-8 overflow-y-auto table-container" style={{ maxHeight: '200px' }}>
+            <div className="mt-8 overflow-y-auto table-container" style = {{ maxHeight: '200px' }}>
               <table>
                 <tbody>
                   <tr>
-                    <td>Best pdq AIC : </td>
-                    <td>[{errorData ? errorData.best_pdq_AIC_three : null}]</td>
-                  </tr>
-                  <tr>
-                    <td>Best pdq BIC : </td>
-                    <td>[{errorData ? errorData.best_pdq_MSE_three : null}]</td>
-                  </tr>
-                  <tr>
                     <td>Percent ten days : </td>
-                    <td>{predictData2 ? predictData2[1].toFixed(2) : null} %</td>
+                    <td>{prophetData2 ? prophetData2[1].toFixed(2) : null} %</td>
                   </tr>
                 </tbody>
               </table>

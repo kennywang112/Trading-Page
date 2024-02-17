@@ -119,8 +119,12 @@ def prophet_predict(full_data):
     model.fit(df)
     future = model.make_future_dataframe(periods=10)
     forecast = model.predict(future)
-
-    return forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']]
+    predicted = forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']].tail(10).reset_index()
+    ten_days_after = predicted['yhat'].iloc[9]
+    one_days_after = predicted['yhat'].iloc[0]
+    percentage_change = ((ten_days_after - one_days_after) / one_days_after) * 100
+    
+    return forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']], percentage_change
 
 app = Flask(__name__)
 CORS(app)
@@ -146,8 +150,8 @@ def home():
 
     best_pdq_AIC_three, best_pdq_MSE_three = arima_AIC(full_data_three['open'], 4, 4, 4)
     arima_forecast_three, percentage_change_three = arima_predict(full_data_three, best_pdq_MSE_three)
-    prophet_forecast_one = prophet_predict(full_data_one)
-    prophet_forecast_three = prophet_predict(full_data_three)
+    prophet_forecast_one, p_change_one = prophet_predict(full_data_one)
+    prophet_forecast_three, p_change_three = prophet_predict(full_data_three)
 
     # 整合成 JSON 物件
     result = {
@@ -168,6 +172,8 @@ def home():
         "prophet_predict": {
             "forecast_one": prophet_forecast_one.to_json(orient = 'records'),
             "forecast_three": prophet_forecast_three.to_json(orient = 'records'),
+            "percentage_change_one": p_change_one,
+            "percentage_change_three": p_change_three,
         }
     }
 
