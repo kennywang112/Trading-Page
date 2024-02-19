@@ -32,7 +32,7 @@ export default function Home() {
   };
   const handleCryptoChange = async (crpyto) => {
     if (crpyto.target.value != selectedCrypto) {
-      const response = (await axios.get(`http://127.0.0.1:5000/?instId=${crpyto.target.value}-USDT`));
+      const response = (await axios.get(`http://127.0.0.1:5000/?instId=${crpyto.target.value}-USD`));
       setFullData(response.data);
     }
     setSelectedCrypto(crpyto.target.value);
@@ -44,7 +44,7 @@ export default function Home() {
   const fetchApi = async () => {
     try {
       if (!isDataFetched || !fullData) {
-        const response = (await axios.get(`http://127.0.0.1:5000/?instId=${selectedCrypto}-USDT`));
+        const response = (await axios.get(`http://127.0.0.1:5000/?instId=${selectedCrypto}-USD`));
         setIsDataFetched(true);
         setFullData(response.data);
         return response;
