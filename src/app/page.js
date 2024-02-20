@@ -72,10 +72,10 @@ export default function Home() {
         setErrorData(fullData.error);
       }
       // get dates and prices
-      const dates_one = await stockData_one.map(entry => new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }));
-      const prices_one = await stockData_one.map(entry => entry.close);
-      const dates_three = await stockData_three.map(entry => new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }));
-      const prices_three = await stockData_three.map(entry => entry.close);
+      const dates_one = await stockData_one.map(entry => new Date(entry.Date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }));
+      const prices_one = await stockData_one.map(entry => entry.Close);
+      const dates_three = await stockData_three.map(entry => new Date(entry.Date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }));
+      const prices_three = await stockData_three.map(entry => entry.Close);
       // adding date
       let dates1_ten_days_later = [];
       let dates3_ten_days_later = [];
@@ -369,10 +369,10 @@ export default function Home() {
                     {apiData1.map((item, index) => (
                       <tr key={index}>
                         <td className="with-border">{index}</td>
-                        <td className="with-border">{item.open}</td>
-                        <td className="with-border">{item.high}</td>
-                        <td className="with-border">{item.low}</td>
-                        <td>{item.close}</td>
+                        <td className="with-border">{item.Open}</td>
+                        <td className="with-border">{item.High}</td>
+                        <td className="with-border">{item.Low}</td>
+                        <td>{item.Close}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -450,10 +450,10 @@ export default function Home() {
                     {apiData2.map((item, index) => (
                       <tr key={index}>
                         <td className="with-border">{index}</td>
-                        <td className="with-border">{item.open}</td>
-                        <td className="with-border">{item.high}</td>
-                        <td className="with-border">{item.low}</td>
-                        <td>{item.close}</td>
+                        <td className="with-border">{item.Open}</td>
+                        <td className="with-border">{item.High}</td>
+                        <td className="with-border">{item.Low}</td>
+                        <td>{item.Close}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -547,10 +547,10 @@ export default function Home() {
                   {apiData1.map((item, index) => (
                     <tr key={index}>
                       <td className="with-border">{index}</td>
-                      <td className="with-border">{item.open}</td>
-                      <td className="with-border">{item.high}</td>
-                      <td className="with-border">{item.low}</td>
-                      <td>{item.close}</td>
+                      <td className="with-border">{item.Open}</td>
+                      <td className="with-border">{item.High}</td>
+                      <td className="with-border">{item.Low}</td>
+                      <td>{item.Close}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -624,10 +624,10 @@ export default function Home() {
                   {apiData2.map((item, index) => (
                     <tr key={index}>
                       <td className="with-border">{index}</td>
-                      <td className="with-border">{item.open}</td>
-                      <td className="with-border">{item.high}</td>
-                      <td className="with-border">{item.low}</td>
-                      <td>{item.close}</td>
+                      <td className="with-border">{item.Open}</td>
+                      <td className="with-border">{item.High}</td>
+                      <td className="with-border">{item.Low}</td>
+                      <td>{item.Close}</td>
                     </tr>
                   ))}
                 </tbody>
