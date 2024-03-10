@@ -368,11 +368,11 @@ export default function Home() {
                   <tbody>
                     {apiData1.map((item, index) => (
                       <tr key={index}>
-                        <td className="with-border">{index}</td>
-                        <td className="with-border">{item.Open}</td>
-                        <td className="with-border">{item.High}</td>
-                        <td className="with-border">{item.Low}</td>
-                        <td>{item.Close}</td>
+                        <td className="with-border">{index.toFixed(1)}</td>
+                        <td className="with-border">{item.Open.toFixed(1)}</td>
+                        <td className="with-border">{item.High.toFixed(1)}</td>
+                        <td className="with-border">{item.Low.toFixed(1)}</td>
+                        <td>{item.Close.toFixed(1)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -396,7 +396,7 @@ export default function Home() {
                   {predictData1 && predictData1[0].map((data, index) => (
                     <tr key={index}>
                       <td className = "with-border">{index}</td>
-                      <td>{data.toFixed(3)}</td>
+                      <td>{data.toFixed(1)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -449,11 +449,11 @@ export default function Home() {
                   <tbody>
                     {apiData2.map((item, index) => (
                       <tr key={index}>
-                        <td className="with-border">{index}</td>
-                        <td className="with-border">{item.Open}</td>
-                        <td className="with-border">{item.High}</td>
-                        <td className="with-border">{item.Low}</td>
-                        <td>{item.Close}</td>
+                        <td className="with-border">{index.toFixed(1)}</td>
+                        <td className="with-border">{item.Open.toFixed(1)}</td>
+                        <td className="with-border">{item.High.toFixed(1)}</td>
+                        <td className="with-border">{item.Low.toFixed(1)}</td>
+                        <td>{item.Close.toFixed(1)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -477,7 +477,7 @@ export default function Home() {
                   {predictData1 && predictData1[0].map((data, index) => (
                     <tr key={index}>
                       <td className = "with-border">{index}</td>
-                      <td>{data.toFixed(3)}</td>
+                      <td>{data.toFixed(1)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -546,11 +546,11 @@ export default function Home() {
                 <tbody>
                   {apiData1.map((item, index) => (
                     <tr key={index}>
-                      <td className="with-border">{index}</td>
-                      <td className="with-border">{item.Open}</td>
-                      <td className="with-border">{item.High}</td>
-                      <td className="with-border">{item.Low}</td>
-                      <td>{item.Close}</td>
+                      <td className="with-border">{index.toFixed(1)}</td>
+                      <td className="with-border">{item.Open.toFixed(1)}</td>
+                      <td className="with-border">{item.High.toFixed(1)}</td>
+                      <td className="with-border">{item.Low.toFixed(1)}</td>
+                      <td>{item.Close.toFixed(1)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -623,11 +623,11 @@ export default function Home() {
                 <tbody>
                   {apiData2.map((item, index) => (
                     <tr key={index}>
-                      <td className="with-border">{index}</td>
-                      <td className="with-border">{item.Open}</td>
-                      <td className="with-border">{item.High}</td>
-                      <td className="with-border">{item.Low}</td>
-                      <td>{item.Close}</td>
+                      <td className="with-border">{index.toFixed(1)}</td>
+                      <td className="with-border">{item.Open.toFixed(1)}</td>
+                      <td className="with-border">{item.High.toFixed(1)}</td>
+                      <td className="with-border">{item.Low.toFixed(1)}</td>
+                      <td>{item.Close.toFixed(1)}</td>
                     </tr>
                   ))}
                 </tbody>
